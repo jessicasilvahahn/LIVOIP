@@ -3,15 +3,34 @@ from modules.ari.http import Http
 from modules.ari.http import Method
 from modules.ari.uris import GET_RECORD
 from modules.ari.uris import LIST_RECORDS
-
+from modules.events import Events
 
 class Fault(dict):
     def __missing__(self, key):
     return key
 
 class RegisterLawfulInterception():
-    def __init__(self):
-        pass
+    def __init__(self, log, server, user, password, target, protocol, port, pcap_path):
+        self.log = log
+        self.server = server
+        self.user = user
+        self.password = password
+        self.target = target
+        self.protocol = protocol
+        self.port = port
+        self.pcap_path = pcap_path
+        self.event = None
+  
+    def register(self):
+        self.log.info("RegisterLawfulInterception::register")
+        self.event = Events.Events(self.server, self.user, self.password, self.log)
+        self.event.setup()
+        self.event.event_save_iri(self.target, self.protocol, self.port, self.pcap_path)
+        self.event.event_save_call(self.target)
+
+    def run(self):
+        if(self.event):
+            self.event.run()
 
 class GetLawfulInterception(Http):
     

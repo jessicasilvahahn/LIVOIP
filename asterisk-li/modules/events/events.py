@@ -7,17 +7,19 @@ import time
 
 class Events():
     """Communication with AMI Asterisk"""
-	def __init__(self, server:str, user:str, password:str):
+	def __init__(self, server:str, user:str, password:str, log):
         self.__manager = Manager(loop=asyncio.get_event_loop(),
             host='server',
             username='user',
             secret='password')
+        self.log = log
     
     def callback_action_record_call(self, future):
         #colocar no log depois
-        print(future.result())
+        self.log.info("Events::callback_action_record_call: Result: " + str(future.result()))
     
     def start_write_pcap(self, manager, event, target , protocol, port, pcap_path):
+        self.log.info("Events::start_write_pcap")
         target_id = None
         sip = None
         try:
@@ -31,6 +33,7 @@ class Events():
             print("start_write_pcap": str(error))
 
     def start_record_call(self, manager, event, target):
+        self.log.info("Events::start_record_call")
         target_id = None
         channel = None
         file_name = ""
@@ -48,15 +51,22 @@ class Events():
             print("call_callback_ami": str(error))
 
     def event_save_iri(self, target, protocol, port, pcap_path):
+        self.log.info("Events::event_save_iri")
         event = 'DialBegin'
         self.__manager.register_event(event, self.start_write_pcap, target, protocol, port, pcap_path)
 
     def event_save_call(self, target):
+        self.log.info("Events::event_save_call")
         event = 'DialEnd'
         self.__manager.register_event(event, self.start_record_call,target)
 
-    def run(self):
+
+    def setup(self):
+        self.log.info("Events::setup")
         self.__manager.connect()
+    
+    def run(self):
+        self.log.info("Events::run")
         try:
             self.__manager.loop.run_forever()
         except KeyboardInterrupt:
