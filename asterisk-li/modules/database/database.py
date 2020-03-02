@@ -6,7 +6,6 @@ class Database():
         self.log = log
         self.conn = None
 
-    
     def connect(self):
         try:
             self.log.info("Database::connect: Trying connect to database: " + str(self.database_name))
@@ -21,19 +20,21 @@ class Database():
         except Exception as error:
             self.log.error("Database::disconnect: Error: " + str(error))
 
-    def execute_query(self, query):
+    def execute_query(self, query, parameters = None):
         try:
             cursor = None
             executed = None
             self.log.info("Database::execute_query: Trying execute query: " + str(query))
             self.connect()
             cursor = self.conn.cursor()
-            cursor.execute(query)
-            executed = self.conn
+            if(parameters):
+                cursor.execute(query, parameters)
+            else:
+                cursor.execute(query)
         except Exception as error:
             self.log.error("Database::execute_query: Error: " + str(error))
         finally:
-            return executed
+            return (cursor,self.conn)
 
 
 
