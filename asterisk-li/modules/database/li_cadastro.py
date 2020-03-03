@@ -3,7 +3,7 @@
 from oficio import Oficio
 
 class LiCadastro(Oficio):
-    def __init__(self, liid, target, uri, number, autority, date, database, log):
+    def __init__(self, liid, target, number, autority, date, database, log):
         super().__init__(number, autority, date, database, log)
         self.liid = liid
         self.target = target
