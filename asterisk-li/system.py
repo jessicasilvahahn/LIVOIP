@@ -13,6 +13,8 @@ import queue
 from li_asterisk import RegisterLawfulInterception
 import time
 import threading
+from li_asterisk import RegisterLawfulInterception
+from modules.database.database import Database
 
 class System():
     
@@ -24,12 +26,33 @@ class System():
         self.stop = False
         self.sleep = 30
         self.li_queue = queue.Queue()
-    
+        self.log = None
+        self.server = None
+        self.user = None
+        self.passwd = None
+        self.protocol = None
+        self.port = None
+        self.db_name = None
+        self.mode = None
+        self.interface_type = None
+
     def run(self):
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-            future_put = executor.submit(self.put_li)
-            future_get = executor.submit(self.get_li)
-        
+        li_asterisk = None
+        database = Database(self.db_name, self.log)
+        if(self.mode == "register_li"):
+            #nao pode rodar como daemon
+            #instanciar db
+            #instanciar cadastro via interface
+            li_asterisk = RegisterLawfulInterception(self.log, self.server, self.user, self.passwd, self.protocol, self.port, "", database)
+            li_asterisk.call_register_interface(self.interface_type)
+        elif(mode == "start_li"):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+                future_put = executor.submit(self.put_li)
+                future_get = executor.submit(self.get_li)
+        elif(mode == "get_iri_cc"):
+            pass
+        else:
+            return
     def put_li(self):
         #pegar do banco
         while(not self.stop):
@@ -81,7 +104,20 @@ class System():
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s: '\
                                       '%(message)s')
         self.log_handler.setFormatter(formatter)
-        li_asterisk = logging.getLogger('li_asterisk')
-        li_asterisk.setLevel(LEVELS.get(self.config.get('log', 'level'), logging.NOTSET))
-        li_asterisk.addHandler(self.log_handler)
+        self.log = logging.getLogger('li_asterisk')
+        self.log.setLevel(LEVELS.get(self.config.get('log', 'level'), logging.NOTSET))
+        self.log.addHandler(self.log_handler)
 
+        self.server = self.config.get("asterisk", "ip")
+        self.user = self.config.get("asterisk", "user")
+        self.passwd = self.server = self.config.get("asterisk", "password")
+        self.port = self.server = self.config.getint("li", "port")
+        self.protocol = self.server = self.config.get("li", "protocol")
+        self.mode = self.server = self.config.get("li", "mode")
+        self.interface_type = self.server = self.config.get("li", "interface")
+        self.db_name = self.server = self.config.get("database", "name")
+
+def if __name__ == "__main__":
+    manager = System()
+    manager.setup()
+    manager.start()

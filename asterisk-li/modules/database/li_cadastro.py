@@ -1,6 +1,5 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
-
-from oficio import Oficio
+from modules.database.oficio import Oficio
 
 class LiCadastro(Oficio):
     def __init__(self, liid, target, number, autority, date, database, log):

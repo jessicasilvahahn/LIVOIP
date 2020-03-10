@@ -2,9 +2,9 @@
 from modules.database.li_cadastro import LiCadastro
 from modules.database import Database
 class Interface():
-    def __init__(self, log, database_name):
+    def __init__(self, log, database):
         self.log = log
-        self.db_name = database_name
+        self.database = database
 
     def li_register(self):
         print("######## Lawful Interception #########\n")
@@ -17,7 +17,6 @@ class Interface():
         target = input("CPF do alvo\n")
         #calcular hash por em quanto
         liid = hash(target)
-        database = Database(self.db_name, self.log)
-        li_cadastro = LiCadastro(liid, target, number, autority, date, database, self.log)
+        li_cadastro = LiCadastro(liid, target, number, autority, date, self.database, self.log)
         return li_cadastro
     

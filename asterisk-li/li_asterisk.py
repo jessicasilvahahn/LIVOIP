@@ -4,29 +4,44 @@ from modules.ari.http import Method
 from modules.ari.uris import GET_RECORD
 from modules.ari.uris import LIST_RECORDS
 from modules.events import Events
+from modules.user_interface.simple.interface import Interface
 
 class Fault(dict):
     def __missing__(self, key):
     return key
 
 class RegisterLawfulInterception():
-    def __init__(self, log, server, user, password, target, protocol, port, pcap_path):
+    def __init__(self, log, server, user, password, protocol, port, pcap_path, database):
         self.log = log
         self.server = server
         self.user = user
         self.password = password
-        self.target = target
         self.protocol = protocol
         self.port = port
         self.pcap_path = pcap_path
         self.event = None
+        self.database = database
   
+    def call_register_interface(self, mode):
+        interface = None
+        li_registered = None
+        if(mode == "simple"):
+            interface = Interface(self.log, self.database)
+            li_registered = interface.li_register()
+            return li_registered
+        elif(mode == "web"):
+            pass
+        
+        else:
+            self.log.error("RegisterLawfulInterception::call_interface: mode " + str(mode) + " invalid\n")
+
     def register(self):
         self.log.info("RegisterLawfulInterception::register")
-        self.event = Events.Events(self.server, self.user, self.password, self.log)
+        """self.event = Events.Events(self.server, self.user, self.password, self.log)
         self.event.setup()
+        #pegar essas informacoes do banco
         self.event.event_save_iri(self.target, self.protocol, self.port, self.pcap_path)
-        self.event.event_save_call(self.target)
+        self.event.event_save_call(self.target)"""
 
     def run(self):
         if(self.event):
