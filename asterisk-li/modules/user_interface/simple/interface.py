@@ -1,6 +1,5 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from modules.database.li_cadastro import LiCadastro
-from modules.database import Database
 class Interface():
     def __init__(self, log, database):
         self.log = log

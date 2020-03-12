@@ -7,7 +7,7 @@ import logging.handlers
 import sys
 import signal
 import daemon
-from daemon.pidfile import PIDLockFile
+#from daemon.pidfile import PIDLockFile
 import concurrent.futures
 import queue
 from li_asterisk import RegisterLawfulInterception
@@ -73,7 +73,7 @@ class System():
 
     def start(self, preserved_file = None):
         if self.service_args.daemon:
-            with daemon.DaemonContext(pidfile= PIDLockFile(self.service_args.daemon),files_preserve=[self.log_handler.stream, preserved_file]):
+            with daemon.DaemonContext(pidfile= daemon.pidfile.PIDLockFile(self.service_args.daemon),files_preserve=[self.log_handler.stream, preserved_file]):
                 self.run()
         else:
             self.run()
@@ -117,7 +117,7 @@ class System():
         self.interface_type = self.server = self.config.get("li", "interface")
         self.db_name = self.server = self.config.get("database", "name")
 
-def if __name__ == "__main__":
+if __name__ == "__main__":
     manager = System()
     manager.setup()
     manager.start()

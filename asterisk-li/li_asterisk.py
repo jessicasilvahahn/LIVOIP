@@ -3,12 +3,12 @@ from modules.ari.http import Http
 from modules.ari.http import Method
 from modules.ari.uris import GET_RECORD
 from modules.ari.uris import LIST_RECORDS
-from modules.events import Events
+import modules.events
 from modules.user_interface.simple.interface import Interface
 
 class Fault(dict):
     def __missing__(self, key):
-    return key
+        return key
 
 class RegisterLawfulInterception():
     def __init__(self, log, server, user, password, protocol, port, pcap_path, database):
@@ -83,7 +83,7 @@ class GetLawfulInterception(Http):
                         file_name =  file_path + record
                         with open(file_name, "wb") as file:
                             for chunk in response.iter_content(self.__buffer_size):
-                            file.write(chunk)
+                                file.write(chunk)
         except Exception as error:
             raise Exception(str(error))
         
