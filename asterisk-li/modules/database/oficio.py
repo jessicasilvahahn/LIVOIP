@@ -10,7 +10,7 @@ class Oficio():
     def register(self):
         self.log.info("Oficio::register: Trying register oficio")
         sql = '''INSERT INTO oficio(numero_oficio,autoridade,date_li)
-            VALUES(?,?,?) '''
+            VALUES(?,?,?);'''
         
         self.db.connect()
 
@@ -23,9 +23,9 @@ class Oficio():
     def get_oficios(self):
         self.log.info("Oficio::get_oficios: Trying get all oficios")
         oficios = []
-        sql = '''select * from oficio'''
+        sql = '''select * from oficio;'''
         self.db.connect()
-        (cursor,conn) = self.db.execute_query(sql)
+        (cursor,conn) = self.db.execute_query(sql,None)
         oficios = cursor.fetchall()
         self.log.info("Oficio::get_oficios: Oficios: " + str(oficios))
         return oficios

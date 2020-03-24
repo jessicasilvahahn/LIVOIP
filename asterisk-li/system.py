@@ -45,13 +45,14 @@ class System():
             #instanciar cadastro via interface
             li_asterisk = RegisterLawfulInterception(self.log, self.server, self.user, self.passwd, self.protocol, self.port, "", database)
             li_asterisk.call_register_interface(self.interface_type)
-        elif(mode == "start_li"):
+        elif(self.mode == "start_li"):
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
                 future_put = executor.submit(self.put_li)
                 future_get = executor.submit(self.get_li)
-        elif(mode == "get_iri_cc"):
+        elif(self.mode == "get_iri_cc"):
             pass
         else:
+            print("DEBUG03")
             return
     def put_li(self):
         #pegar do banco
@@ -81,7 +82,7 @@ class System():
     def stop(self):
         pass
 
-    def setup(self):
+    def setup(self, file):
         parser = argparse.ArgumentParser(description='Allowed options')
         parser.add_argument('-c', '--config',
                             help='path to configuration file',
@@ -113,11 +114,11 @@ class System():
         self.passwd = self.server = self.config.get("asterisk", "password")
         self.port = self.server = self.config.getint("li", "port")
         self.protocol = self.server = self.config.get("li", "protocol")
-        self.mode = self.server = self.config.get("li", "mode")
+        self.mode = self.config.get("li", "mode")
         self.interface_type = self.server = self.config.get("li", "interface")
         self.db_name = self.server = self.config.get("database", "name")
 
 if __name__ == "__main__":
     manager = System()
-    manager.setup()
+    manager.setup("/tmp/li_asterisk.log")
     manager.start()

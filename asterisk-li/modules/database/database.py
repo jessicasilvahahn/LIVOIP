@@ -1,4 +1,5 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
+import sqlite3
 
 class Database():
     def __init__(self, db_name, log):

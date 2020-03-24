@@ -9,9 +9,9 @@ class Interface():
         print("######## Lawful Interception #########\n")
         print("******* Register LI **********\n")
         print("------- Oficio ------\n")
-        number = input("Número do oficio\n")
+        number = input("Numero do oficio\n")
         autority = input("Autoridade\n")
-        date = input("Data da Interceptação\n")
+        date = input("Data da Interceptacao\n")
         print("------- Alvo ------\n")
         target = input("CPF do alvo\n")
         #calcular hash por em quanto
