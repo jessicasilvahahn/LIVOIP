@@ -31,14 +31,16 @@ class Oficio():
         return oficios
 
     def get_oficio(self, oficio):
-        self.log.info("Oficio::get_oficio: Trying get oficio: " + str(oficio))
+        print("DEBUG" + str(self.log))
+        self.log.debug("Oficio::get_oficio: Trying get oficio: " + str(oficio))
         number = None
+        print("DEBUG02 get_oficio")
         sql = '''select numero_oficio from oficio where numero_oficio = ?'''
         self.db.connect()
-        parameters = (oficio)
+        parameters = [oficio]
         (cursor,conn) = self.db.execute_query(sql, parameters)
         number = cursor.fetchone()
         self.log.info("Oficio::get_oficio: Oficio: " + str(number))
-        return oficios
+        return number
 
 

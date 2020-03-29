@@ -15,13 +15,13 @@ class LiCadastro(Oficio):
         oficio = None
         super().register()
         oficio = super().get_oficio(self.number)
-        uri = self.get_uri(target)
+        uri = self.get_uri(self.target)
         sql = '''INSERT INTO li_cadastro(liid,target,uri,numero_oficio)
             VALUES(?,?,?,?) '''
         
         self.db.connect()
 
-        parameters = (self.liid,self.target,uri,oficio)
+        parameters = [self.liid,self.target,uri,oficio[0]]
         self.log.info("LiCadastro::register: Parameters: " + str(parameters))
         (cursor,conn) = self.db.execute_query(sql,parameters)
         conn.commit()
@@ -42,7 +42,7 @@ class LiCadastro(Oficio):
         uri = None
         sql = '''select uri from operadora where cpf = ?'''
         self.db.connect()
-        parameters = (cpf)
+        parameters = [cpf]
         (cursor,conn) = self.db.execute_query(sql, parameters)
         uri = cursor.fetchone()
         self.log.info("LiCadastro::get_uri: URI: " + str(uri))
