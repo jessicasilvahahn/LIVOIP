@@ -17,5 +17,7 @@ class Interface():
         #calcular hash por em quanto
         liid = hash(target)
         li_cadastro = LiCadastro(liid, target, number, autority, date, self.database, self.log)
-        return li_cadastro
+        print("Deseja sair da interface de registro? (y/n)\n")
+        leave = input("")
+        return (li_cadastro,leave)
     

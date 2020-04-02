@@ -31,10 +31,8 @@ class Oficio():
         return oficios
 
     def get_oficio(self, oficio):
-        print("DEBUG" + str(self.log))
         self.log.debug("Oficio::get_oficio: Trying get oficio: " + str(oficio))
         number = None
-        print("DEBUG02 get_oficio")
         sql = '''select numero_oficio from oficio where numero_oficio = ?'''
         self.db.connect()
         parameters = [oficio]

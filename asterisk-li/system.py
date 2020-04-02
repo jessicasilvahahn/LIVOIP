@@ -7,7 +7,7 @@ import logging.handlers
 import sys
 import signal
 import daemon
-#from daemon.pidfile import PIDLockFile
+from daemon.pidfile import PIDLockFile
 import concurrent.futures
 import queue
 from li_asterisk import RegisterLawfulInterception
@@ -40,11 +40,13 @@ class System():
         li_asterisk = None
         database = Database(self.db_name, self.log)
         if(self.mode == "register_li"):
+            leave = 'n'
             #nao pode rodar como daemon
             #instanciar db
             #instanciar cadastro via interface
-            li_asterisk = RegisterLawfulInterception(self.log, self.server, self.user, self.passwd, self.protocol, self.port, "", database)
-            li_asterisk.call_register_interface(self.interface_type)
+            while(leave == 'n'):
+                li_asterisk = RegisterLawfulInterception(self.log, self.server, self.user, self.passwd, self.protocol, self.port, "", database)
+                leave = li_asterisk.call_register_interface(self.interface_type)
         elif(self.mode == "start_li"):
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
                 future_put = executor.submit(self.put_li)
@@ -74,7 +76,7 @@ class System():
 
     def start(self, preserved_file = None):
         if self.service_args.daemon:
-            with daemon.DaemonContext(pidfile= daemon.pidfile.PIDLockFile(self.service_args.daemon),files_preserve=[self.log_handler.stream, preserved_file]):
+            with daemon.DaemonContext(pidfile=PIDLockFile(self.service_args.daemon),files_preserve=[self.log_handler.stream, preserved_file]):
                 self.run()
         else:
             self.run()
@@ -82,7 +84,7 @@ class System():
     def stop(self):
         pass
 
-    def setup(self, file):
+    def setup(self):
         parser = argparse.ArgumentParser(description='Allowed options')
         parser.add_argument('-c', '--config',
                             help='path to configuration file',
@@ -100,7 +102,7 @@ class System():
             'error': logging.ERROR,
             'critical': logging.CRITICAL}
 
-        self.log_handler = logging.handlers.RotatingFileHandler(file, maxBytes=self.config.getint('log', 'size'),
+        self.log_handler = logging.handlers.RotatingFileHandler(self.config.get('log', 'name'), maxBytes=self.config.getint('log', 'size'),
                                                        backupCount=self.config.getint('log', 'backups'))
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s: '\
                                       '%(message)s')
@@ -120,5 +122,5 @@ class System():
 
 if __name__ == "__main__":
     manager = System()
-    manager.setup("/tmp/li_asterisk.log")
+    manager.setup()
     manager.start()

@@ -16,6 +16,9 @@ class LiCadastro(Oficio):
         super().register()
         oficio = super().get_oficio(self.number)
         uri = self.get_uri(self.target)
+        if(not uri):
+            self.log.warning("LiCadastro::register: URI for target " + str(self.target) + " not found")
+            return
         sql = '''INSERT INTO li_cadastro(liid,target,uri,numero_oficio)
             VALUES(?,?,?,?) '''
         

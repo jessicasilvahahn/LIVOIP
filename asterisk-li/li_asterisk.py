@@ -27,9 +27,9 @@ class RegisterLawfulInterception():
         li_registered = None
         if(mode == "simple"):
             interface = Interface(self.log, self.database)
-            li_registered = interface.li_register()
+            (li_registered,leave) = interface.li_register()
             li_registered.register()
-            return li_registered
+            return leave
         elif(mode == "web"):
             pass
         
