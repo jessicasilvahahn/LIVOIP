@@ -10,8 +10,8 @@ class LiCadastro(Oficio):
         self.log = log
         self.number = number
 
-    def register(self):
-        self.log.info("LiCadastro::register: Trying register Lawful Interception")
+    def register_li(self):
+        self.log.info("LiCadastro::register_li: Trying register Lawful Interception")
         oficio = None
         super().register()
         oficio = super().get_oficio(self.number)
@@ -24,11 +24,22 @@ class LiCadastro(Oficio):
         
         self.db.connect()
 
-        parameters = [self.liid,self.target,uri,oficio[0]]
+        parameters = [self.liid,self.target,uri[0],oficio[0]]
         self.log.info("LiCadastro::register: Parameters: " + str(parameters))
         (cursor,conn) = self.db.execute_query(sql,parameters)
         conn.commit()
         self.log.info("LiCadastro::register: Lawful Interception registered")
+
+    def register_oficio(self):
+        self.log.info("LiCadastro::register_oficio: Trying register Oficio")    
+        sql = '''INSERT INTO oficio(numero_oficio,autoridade,date_li)
+            VALUES(?,?,?) '''   
+        self.db.connect()
+        parameters = [super().number,super().autority,super().date]
+        self.log.info("LiCadastro::register_oficio: Parameters: " + str(parameters))
+        (cursor,conn) = self.db.execute_query(sql,parameters)
+        conn.commit()
+        self.log.info("LiCadastro::register_oficio: Oficio registered")
 
     def get_oficios(self):
         self.log.info("LiCadastro::register: Trying get all LI")
@@ -50,3 +61,27 @@ class LiCadastro(Oficio):
         uri = cursor.fetchone()
         self.log.info("LiCadastro::get_uri: URI: " + str(uri))
         return uri
+
+
+class CadastroOperadora():
+   
+    def  __init__(self, cpf, name, uri, contract, database, log):
+       self.cpf = cpf
+       self.name = name
+       self.uri = uri
+       self.contract = contract
+       self.database = database
+       self.log = log
+
+    def register(self):
+        self.log.info("LiCadastro::register: Trying register Network Operator")
+        sql = '''INSERT INTO operadora(cpf,nome,uri,contrato)
+            VALUES(?,?,?,?) '''
+        parameters = [self.cpf,self.name, self.uri, self.contract]
+        self.database.connect()
+        (cursor,conn) = self.database.execute_query(sql,parameters)
+        conn.commit()
+        self.log.info("LiCadastro::register_oficio: Network Operator registered")
+
+
+    

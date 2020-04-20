@@ -10,6 +10,18 @@ class Fault(dict):
     def __missing__(self, key):
         return key
 
+class RegisterNetworkOperator():
+    def __init__(self, log, database):
+        self.log = log
+        self.database = database
+
+    def register(self):
+        self.log.info("RegisterNetworkOperator::register")
+        interface = Interface(self.log, self.database)
+        (net_op_registered,leave) = interface.network_operator_register()
+        net_op_registered.register()
+        return leave
+
 class RegisterLawfulInterception():
     def __init__(self, log, server, user, password, protocol, port, pcap_path, database):
         self.log = log
@@ -28,7 +40,7 @@ class RegisterLawfulInterception():
         if(mode == "simple"):
             interface = Interface(self.log, self.database)
             (li_registered,leave) = interface.li_register()
-            li_registered.register()
+            li_registered.register_li()
             return leave
         elif(mode == "web"):
             pass

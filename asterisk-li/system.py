@@ -10,11 +10,12 @@ import daemon
 from daemon.pidfile import PIDLockFile
 import concurrent.futures
 import queue
-from li_asterisk import RegisterLawfulInterception
 import time
 import threading
 from li_asterisk import RegisterLawfulInterception
+from li_asterisk import RegisterNetworkOperator
 from modules.database.database import Database
+from modules.events.events import Events
 
 class System():
     
@@ -39,8 +40,8 @@ class System():
     def run(self):
         li_asterisk = None
         database = Database(self.db_name, self.log)
+        leave = 'n'
         if(self.mode == "register_li"):
-            leave = 'n'
             #nao pode rodar como daemon
             #instanciar db
             #instanciar cadastro via interface
@@ -48,22 +49,34 @@ class System():
                 li_asterisk = RegisterLawfulInterception(self.log, self.server, self.user, self.passwd, self.protocol, self.port, "", database)
                 leave = li_asterisk.call_register_interface(self.interface_type)
         elif(self.mode == "start_li"):
-            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            '''with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
                 future_put = executor.submit(self.put_li)
-                future_get = executor.submit(self.get_li)
+                future_get = executor.submit(self.get_li)'''
+            self.put_li()
         elif(self.mode == "get_iri_cc"):
             pass
+        elif(self.mode == "network_operator"):
+            while(leave == 'n'):
+                li_net_op = RegisterNetworkOperator(self.log, database)
+                leave = li_net_op.register()
         else:
             print("DEBUG03")
             return
     def put_li(self):
         #pegar do banco
-        while(not self.stop):
+        '''while(not self.stop):
             li_database = []
             if(lis_database):
                 for li in li_database:
                     self.li_queue.put(li)
-            time.sleep(self.sleep)
+            time.sleep(self.sleep)'''
+        #teste simples
+        event = Events('192.168.25.104','li','li123',self.log)
+        event.setup()
+        #registrando eventos
+        event.event_start_call('alice')
+        event.event_stop_record('alice')
+        event.run()
 
     def get_li(self):
         while(not self.stop):
