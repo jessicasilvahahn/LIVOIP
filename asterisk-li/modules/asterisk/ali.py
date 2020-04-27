@@ -56,11 +56,12 @@ class Ali(Database):
                 if(interceptions):
                     self.log.info("Ali::get_interceptions: Trying send interceptions to iri: " + str(interceptions))
                     self.setup()
-                    self.client_iri.send_message(interceptions)
-                    self.client_iri.send_message("ACK")
+                    #self.client_iri.send_message(interceptions)
+                    #self.client_iri.send_message("ACK")
                     self.log.info("Ali::get_interceptions: Trying send interceptions to record")
-                    #self.client_cc.connect()
-                    #self.client_cc.send_message(interceptions)
+                    self.client_cc.connect()
+                    self.client_cc.send_message(interceptions)
+                    self.client_cc.send_message("ACK")
             
                 self.log.info("Ali::get_interceptions: Sleeping ...")
                 time.sleep(self.sleep_time)
