@@ -16,6 +16,7 @@ from li_asterisk import RegisterLawfulInterception
 from li_asterisk import RegisterNetworkOperator
 from modules.database.database import Database
 from modules.events.events import Events
+from modules.sip.sniffer import Sniffer
 
 class System():
     
@@ -70,14 +71,20 @@ class System():
                 for li in li_database:
                     self.li_queue.put(li)
             time.sleep(self.sleep)'''
-        #teste simples
-        event = Events('192.168.25.104','li','li123',self.log)
+        #teste simples eventos
+        '''event = Events('192.168.25.104','li','li123',self.log)
         event.setup()
         #registrando eventos
         event.event_start_call('alice')
         event.event_stop_record('alice')
-        event.run()
+        event.run()'''
 
+        #teste simples sniffer
+        packets = queue.Queue()
+        sniffer = Sniffer("wlan0","udp",5060,self.log,packets)
+        sniffer.setup()
+        sniffer.start()
+        
     def get_li(self):
         while(not self.stop):
             li = None
