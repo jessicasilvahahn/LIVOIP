@@ -20,10 +20,10 @@ class Record(Events):
 
     def run(self):
         self.log.info("Record::start_event")
-        super().setup()
+        self.setup()
         #registrando eventos
-        super().event_start_call()
-        super().event_stop_record()
+        self.event_start_call()
+        self.event_stop_record()
         super().run()
     
     def get_interceptions(self):
@@ -49,5 +49,8 @@ class Record(Events):
         #iniciando as threads
         self.record.start()
         self.socket.start()
+
+        self.record.join()
+        self.socket.join()
 
 
