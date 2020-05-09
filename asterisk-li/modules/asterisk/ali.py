@@ -1,7 +1,13 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
-from modules.asterisk.database.database import Database
-from modules.asterisk.socket.tcp import Client
+from library.shared.database.database import Database
+from library.socket.tcp import Client
 import time
+from enum import Enum
+
+class Status(Enum):
+    ATIVO = 'A'
+    INATIVO = 'I'
+    FINALIZADO = 'F'
 
 class Ali(Database):
     def __init__(self, db_name, sleep_time, log):
@@ -25,7 +31,7 @@ class Ali(Database):
         targets_tuple = cursor.fetchall()
         for target_tuple in targets_tuple:
             for target in target_tuple:
-                query = "SELECT target from target where id=" + str(target)
+                query = "SELECT target from target where id=" + str(target) + " and flag=\'" + str(Status.ATIVO.value) + "\'"
                 (cursor,conn) = self.execute_query(query)
                 targets_tuple = cursor.fetchall()
                 for target_tuple in targets_tuple:

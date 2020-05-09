@@ -1,7 +1,7 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 
-from modules.asterisk.iri.sniffer.sniffer import Sniffer
-from modules.asterisk.socket.tcp import Server
+from library.sniffer.sniffer import Sniffer
+from library.socket.tcp import Server
 import time
 from os.path import join
 from scapy.all import wrpcap
@@ -28,10 +28,11 @@ class Iri(Sniffer):
         self.log.info("Iri::write_pcap")
         for packet_dict in packets.items():
             self.log.info("Iri::write_pcap: Packets: " + str(packet_dict))
-            packet_list = (packet_dict[1])['packets']
-            timestamp = time.time()
-            name_pcap = (packet_dict[1])['URI'] + "." + str(timestamp) + ".pcap"
+            name_pcap = ((packet_dict[1])['Call-ID'])[0:20] + ".pcap"
+            name_pcap = name_pcap.replace("\r","")
+            name_pcap = name_pcap.replace(" ","")
             name_pcap = join(self.path, name_pcap)
+            packet_list = (packet_dict[1])['packets']
             self.log.info("Iri::write_pcap: Trying save pcap: " + name_pcap)
             wrpcap(name_pcap, packet_list, append=True)
             self.log.info("Iri::write_pcap: Pcap: " + name_pcap + " is terminated")

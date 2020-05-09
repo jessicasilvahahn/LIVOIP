@@ -1,7 +1,7 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
-from modules.asterisk.cc.events.events import Events
-from modules.asterisk.socket.tcp import Server
-from modules.asterisk.database.database import Database
+from library.events.events import Events
+from library.socket.tcp import Server
+from library.shared.database.database import Database
 import threading
 from queue import Queue
 import time
@@ -20,7 +20,7 @@ class Record(Events):
 
     def run(self):
         self.log.info("Record::start_event")
-        self.setup()
+        super().setup()
         #registrando eventos
         self.event_start_call()
         self.event_stop_record()
@@ -33,8 +33,8 @@ class Record(Events):
         while(True):
             self.log.info("Record::get_interceptions")
             interceptions = self.server.receive_msg()
+            self.log.info("Record::get_interceptions: Uris from interceptions: " + str(interceptions))
             if(interceptions):
-                self.log.info("Record::get_interceptions: Uris from interceptions: " + str(interceptions))
                 self.interceptions.put(interceptions)
 
             self.log.info("Record::get_interceptions: Sleeping ...")
