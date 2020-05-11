@@ -6,12 +6,16 @@ import time
 from os.path import join
 from scapy.all import wrpcap
 import threading
+from os.path import exists
+from os import makedirs
 
 class Iri(Sniffer):
     def __init__(self, interface, protocol, sip_port, path_pcap, host, port, buffer_size, sleep, log):
-        super().__init__(interface, protocol, sip_port, log)
+        super().__init__(interface, protocol, sip_port,log)
         self.server = Server(host, port, buffer_size, log)
         self.log = log
+        if(not exists(path_pcap)):
+            makedirs(path_pcap)
         self.path = path_pcap
         self.sniffer = None
         self.socket = None
@@ -26,16 +30,19 @@ class Iri(Sniffer):
 
     def write_pcap(self, packets):
         self.log.info("Iri::write_pcap")
-        for packet_dict in packets.items():
-            self.log.info("Iri::write_pcap: Packets: " + str(packet_dict))
-            name_pcap = ((packet_dict[1])['Call-ID'])[0:20] + ".pcap"
-            name_pcap = name_pcap.replace("\r","")
-            name_pcap = name_pcap.replace(" ","")
-            name_pcap = join(self.path, name_pcap)
-            packet_list = (packet_dict[1])['packets']
-            self.log.info("Iri::write_pcap: Trying save pcap: " + name_pcap)
-            wrpcap(name_pcap, packet_list, append=True)
-            self.log.info("Iri::write_pcap: Pcap: " + name_pcap + " is terminated")
+        self.log.info("Iri::write_pcap: Packets: " + str(packets))
+        self.log.info("Iri::write_pcap: proxy: " + str((packets['proxy'])))
+        name_pcap = (packets['Call-ID'])[0:20] + ".pcap"
+        if(packets['proxy']):
+            name_pcap = (packets['proxy'])[0:20] + ".pcap.B"
+       
+        name_pcap = name_pcap.replace("\r","")
+        name_pcap = name_pcap.replace(" ","")
+        name_pcap = join(self.path, name_pcap)
+        packet_list = packets['packets']
+        self.log.info("Iri::write_pcap: Trying save pcap: " + name_pcap)
+        wrpcap(name_pcap, packet_list, append=True)
+        self.log.info("Iri::write_pcap: Pcap: " + name_pcap + " is terminated")
         return
 
     
