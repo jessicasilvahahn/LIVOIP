@@ -16,6 +16,7 @@ from os.path import exists
 from os import makedirs
 import threading
 import time
+from os.path import split
 
 class Evidences():
     def __init__(self, iri:dict, cc:dict, email:dict, host:str, log, database):
@@ -44,6 +45,7 @@ class Evidences():
         return path_dir
     
     def get_iri(self, name:str, new_path:str):
+        state = False
         self.log.info("Evidences::get_iri: file: " + str(name))
         host = self.iri_client.server_parameters['host'] + ':' + self.iri_client.server_parameters['port']
         url = GET_PCAP.format(host) + "?file=" + str(name)
@@ -55,10 +57,36 @@ class Evidences():
             for chunk in response.iter_content(self.iri_buffer):
                 file.write(chunk)
             file.close()
-            return True
+            proxy = name + '.B'
+            new_path = join((split(new_path))[0], proxy)
+            state = self.get_iri_proxy(proxy,new_path)
+        
+        self.log.info("Evidences::get_iri: state: " + str(state))
+        return state
 
-        return False
+    def get_iri_proxy(self, name:str,new_path:str):
+        state = False
+        try:
+            self.log.info("Evidences::get_iri_proxy: " + str(name))
+            host = self.iri_client.server_parameters['host'] + ':' + self.iri_client.server_parameters['port']
+            url = GET_PCAP.format(host) + "?file=" + str(name)
+            (code, json, response) = self.iri_client.http_request(Method.GET,url,True)
+            self.log.info("Evidences::get_iri_proxy: Status code: " + str(code))
+            if(code == 200):
+                self.log.info("Evidences::get_iri_proxy: Trying save file: " + str(name))
+                file = open(new_path, 'wb')
+                for chunk in response.iter_content(self.iri_buffer):
+                    file.write(chunk)
+                file.close()
+                state = True
+            
+            self.log.info("Evidences::get_iri_proxy: state: " + str(state))
+        except Exception as error:
+            self.log.error("Evidences::get_iri_proxy: Error: " + str(error))
+        
+        return state
 
+    
     def filter_pcap(self, pcap, filter):
         #filtrar pcap de acordo com o call-id se precisar
         call_id = filter
@@ -80,6 +108,7 @@ class Evidences():
         return
 
     def get_cc(self,name:str,new_path:str):
+        state = False
         self.log.info("Evidences::get_cc: file: " + str(name))
         host = self.cc_client.server_parameters['host'] + ':' + self.cc_client.server_parameters['port']
         self.log.info("Evidences::get_cc: host: " + str(host))
@@ -93,9 +122,10 @@ class Evidences():
             for chunk in response.iter_content(self.cc_buffer):
                 file.write(chunk)
             file.close()
-            return True
+            state = True
         
-        return False
+        self.log.info("Evidences::get_cc: state: " + str(state))
+        return state
 
     def get_targets(self):
         while(True):
@@ -166,11 +196,16 @@ class Evidences():
                     new_path_iri = join(new_path_iri,iri)
                     new_path_cc = self.create_dir(self.path_cc,targets[0])
                     new_path_cc = join(new_path_cc,cc)
-                    if(self.get_cc(cc,new_path_cc) and self.get_iri(iri,new_path_iri)):
-                        urls = {'url_iri': url_iri + '?file=' + str(iri) + "&target=" + str(targets[0]), 'url_cc': url_cc + '?file=' + str(cc) + "&target=" + str(targets[0]), 'cpf': targets[0]}
+                    state_iri = self.get_cc(cc,new_path_cc)
+                    state_cc = self.get_iri(iri,new_path_iri)
+                    self.log.debug("Evidences::get_evidences: states: " + str(state_iri) + ' ' + str(state_cc))
+                    if(state_iri and state_cc):
+                        self.log.debug("Evidences::get_evidences: evidences (iri and cc) founded!")
+                        urls = {'url_iri_a': url_iri + '?file=' + str(iri) + "&target=" + str(targets[0]),'url_iri_b': url_iri + '?file=' + str(iri) + '.B' + "&target=" + str(targets[0]) ,'url_cc': url_cc + '?file=' + str(cc) + "&target=" + str(targets[0]), 'cpf': targets[0]}
                         self.alert_lea((targets[1])['lea'],urls,(targets[1])['cdr_targets_id'])
                     else:
-                        self.log.error("Evidences::get_evidences: Error to get evidences (iri and cc)")
+                        self.alerted_targets.remove(targets[0])
+                        self.log.warning("Evidences::get_evidences: evidences (iri and cc) not found")
             self.log.info("Evidences::get_evidences: Sleeping ... ")
             time.sleep(3)
 
@@ -185,7 +220,7 @@ class Evidences():
                 self.database.disconnect()
                 email = email[0]
                 self.log.info("Evidences::alert_lea: Lea: " + str(email))
-                content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap: <a href=\"" + urls['url_iri'] + "\">" + urls['cpf'] + ".pcap" + "</a> <p> <br><p>Audio: <a href=\"" + urls['url_cc'] + "\">" + urls['cpf'] + ".wav" + "</a><p>"
+                content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap A: <a href=\"" + urls['url_iri_a'] + "\">" + urls['cpf'] + ".pcap" + "</a> <br> Pcap B: <a href=\"" + urls['url_iri_b'] + "\">" + urls['cpf'] + ".pcap" + "</a> <p> <br><p>Audio: <a href=\"" + urls['url_cc'] + "\">" + urls['cpf'] + ".wav" + "</a><p>"
                 subject = "[Investigacao] ALERT: Novas evidencias do alvo " + str(urls['cpf'])
                 self.log.info("Evidences::alert_lea: Content: " + str(content) + " ,subject: " + str(subject))
                 self.email.send(email,subject,content)

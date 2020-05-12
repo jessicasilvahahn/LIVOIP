@@ -59,7 +59,7 @@ class Handler(BaseHTTPRequestHandler):
         passowrd = None
         cpf = None
         file = None
-        mime_type = MimeType.AUDIO
+        mime_type = MimeType.TEXT
         query_string = parse.urlparse(self.path).query
         fields = parse.parse_qs(query_string)
         self.log.info("Server::do_GET: fields: " + str(fields))
@@ -79,8 +79,8 @@ class Handler(BaseHTTPRequestHandler):
 
                 path = join(uri_evidences.path + '/' + str(cpf), file)
                 is_pcap = file.split(".")
-                if(is_pcap[1] == "pcap"):
-                    mime_type = MimeType.TEXT
+                if(is_pcap[0] == "wav"):
+                    mime_type = MimeType.AUDIO
 
                 self.get_file(path,mime_type,file)
                 
