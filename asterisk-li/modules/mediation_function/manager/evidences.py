@@ -7,6 +7,7 @@ from library.smtp.smtp import SmtpGmail
 from library.smtp.smtp import MimeType
 from scapy.utils import PcapReader
 from scapy.all import wrpcap
+from scapy.all import rdpcap
 from os.path import split
 from os import rename
 from os.path import join
@@ -17,6 +18,7 @@ from os import makedirs
 import threading
 import time
 from os.path import split
+from heapq import merge
 
 class Evidences():
     def __init__(self, iri:dict, cc:dict, email:dict, host:str, log, database):
@@ -52,14 +54,22 @@ class Evidences():
         (code, json, response) = self.iri_client.http_request(Method.GET,url,True)
         self.log.info("Evidences::get_iri: Status code: " + str(code))
         if(code == 200):
+            name_new_pcap = name
+            path_new_pcap = new_path
+            name = name + '.A'
             self.log.info("Evidences::get_iri: Trying save file: " + str(name))
+            new_path = join(new_path,name)
+            pcap_a = new_path
             file = open(new_path, 'wb')
             for chunk in response.iter_content(self.iri_buffer):
                 file.write(chunk)
             file.close()
             proxy = name + '.B'
             new_path = join((split(new_path))[0], proxy)
+            pcap_b = new_path
             state = self.get_iri_proxy(proxy,new_path)
+            if(state):
+                state = self.join_pcap(pcap_a, pcap_b, path_new_pcap, name_new_pcap)
         
         self.log.info("Evidences::get_iri: state: " + str(state))
         return state
@@ -87,25 +97,26 @@ class Evidences():
         return state
 
     
-    def filter_pcap(self, pcap, filter):
-        #filtrar pcap de acordo com o call-id se precisar
-        call_id = filter
-        self.log.info("Evidences::filter_pcap: file: " + str(pcap))
-        split_path = split(pcap)
-        name_pcap = split_path[1] + ".old"
-        new_name = join(split_path[0],name_pcap)
-        self.log.info("Evidences::filter_pcap: Trying rename file: " + str(pcap))
-        rename(pcap,new_name)
-        self.log.info("Evidences::filter_pcap: file renamed: " + str(new_name))
-        for packet in PcapReader(new_name):
-            load = packet.load
-            packet_str = load.decode()
-            if(call_id in packet_str):
-                wrpcap(pcap, packet, append=True)
+    def join_pcap(self, pcap_a, pcap_b, path, name):
+        try:
+            self.log.info("Evidences::join_pcap: files: " + str(pcap_a) + ', ' + str(pcap_b))
+            pcap_a = self.reader_pcap(pcap_a)
+            pcap_b = self.reader_pcap(pcap_b)
+            join_pcaps = merge(pcap_a,pcap_b)
+            new_pcap = sorted(join_pcaps, key=lambda timestamp: timestamp.time)
+            new_path = join(path,name)
+            self.log.info("Evidences::join_pcap: Trying save pcap: " + str(new_path))
+            wrpcap(new_path, new_pcap, append=True)
+            return True
+
+        except Exception as error:
+            self.log.error("Evidences::join_pcap: Error: " + str(error))
+            return False
         
-        self.log.info("Evidences::filter_pcap: Trying remove old file: " + str(new_name))
-        remove(new_name)
-        return
+    def reader_pcap(self, name:str):
+        self.log.info("Evidences::reader_pcap: file: " + name)
+        packets = rdpcap(name)  
+        return packets
 
     def get_cc(self,name:str,new_path:str):
         state = False
@@ -193,7 +204,6 @@ class Evidences():
                     iri = (targets[1])['iri']
                     cc = (targets[1])['cc']
                     new_path_iri = self.create_dir(self.path_iri,targets[0])
-                    new_path_iri = join(new_path_iri,iri)
                     new_path_cc = self.create_dir(self.path_cc,targets[0])
                     new_path_cc = join(new_path_cc,cc)
                     state_iri = self.get_cc(cc,new_path_cc)
@@ -201,7 +211,7 @@ class Evidences():
                     self.log.debug("Evidences::get_evidences: states: " + str(state_iri) + ' ' + str(state_cc))
                     if(state_iri and state_cc):
                         self.log.debug("Evidences::get_evidences: evidences (iri and cc) founded!")
-                        urls = {'url_iri_a': url_iri + '?file=' + str(iri) + "&target=" + str(targets[0]),'url_iri_b': url_iri + '?file=' + str(iri) + '.B' + "&target=" + str(targets[0]) ,'url_cc': url_cc + '?file=' + str(cc) + "&target=" + str(targets[0]), 'cpf': targets[0]}
+                        urls = {'url_iri': url_iri + '?file=' + str(iri) + "&target=" + str(targets[0]),'url_cc': url_cc + '?file=' + str(cc) + "&target=" + str(targets[0]), 'cpf': targets[0]}
                         self.alert_lea((targets[1])['lea'],urls,(targets[1])['cdr_targets_id'])
                     else:
                         self.alerted_targets.remove(targets[0])
@@ -220,7 +230,7 @@ class Evidences():
                 self.database.disconnect()
                 email = email[0]
                 self.log.info("Evidences::alert_lea: Lea: " + str(email))
-                content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap A: <a href=\"" + urls['url_iri_a'] + "\">" + urls['cpf'] + ".pcap" + "</a> <br> Pcap B: <a href=\"" + urls['url_iri_b'] + "\">" + urls['cpf'] + ".pcap" + "</a> <p> <br><p>Audio: <a href=\"" + urls['url_cc'] + "\">" + urls['cpf'] + ".wav" + "</a><p>"
+                content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap: <a href=\"" + urls['url_iri'] + "\">" + urls['cpf'] + ".pcap" + "</a> <p> <br> <p>Audio: <a href=\"" + urls['url_cc'] + "\">" + urls['cpf'] + ".wav" + "</a><p>"
                 subject = "[Investigacao] ALERT: Novas evidencias do alvo " + str(urls['cpf'])
                 self.log.info("Evidences::alert_lea: Content: " + str(content) + " ,subject: " + str(subject))
                 self.email.send(email,subject,content)
