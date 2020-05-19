@@ -31,7 +31,7 @@ class Hi1(Database):
         uri = self.search_target(cpf)
         id_interception = None
         if(uri):
-            flag = '\'' + Status.ATIVO.value '\''
+            flag = '\'' + Status.ATIVO.value + '\''
             query = "INSERT INTO target VALUES(?,?)"
             values = [None,uri]
             self.connect()

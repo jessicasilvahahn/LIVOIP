@@ -19,7 +19,7 @@ class Ali(Database):
 
     def get_targets(self):
         self.log.info("Ali::get_targets: Trying get targets from database")
-        query = "SELECT target from interception where flag=\'" + str(Status.ATIVO.value) + "\'""
+        query = "SELECT target from interception where flag=\'" + str(Status.ATIVO.value) + "\'"
         interceptions = []
         self.connect()
         (cursor,conn) = self.execute_query(query)

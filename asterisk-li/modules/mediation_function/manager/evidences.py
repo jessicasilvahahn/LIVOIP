@@ -64,7 +64,7 @@ class Evidences():
             for chunk in response.iter_content(self.iri_buffer):
                 file.write(chunk)
             file.close()
-            proxy = name + '.B'
+            proxy = name_new_pcap + '.B'
             new_path = join((split(new_path))[0], proxy)
             pcap_b = new_path
             state = self.get_iri_proxy(proxy,new_path)

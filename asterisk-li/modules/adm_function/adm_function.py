@@ -22,8 +22,7 @@ class Adm(Database):
         self.log.info("Adm::add_interception")
         try:
             (lea_user,lea_password,lea_email,target,date) = self.interface.li_register()
-            url = uris.ADD_INTERCEPTION
-            url.format(self.client.server_parameters['host'],target)
+            url = uris.ADD_INTERCEPTION.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port']  ,target)
             self.log.info("Adm::add_interception: Url: " + url)
             (code, json, response) = self.client.http_request(Method.GET,url,False)
             self.log.info("Adm::add_interception: code: " + str(code) + " json: " + str(json))

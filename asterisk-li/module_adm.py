@@ -21,15 +21,21 @@ class System():
         self.parameters = {}
 
     def run(self):
-        stop = 'n'
+        stop = False
         adm = Adm(self.parameters['host'],self.parameters['port'],self.parameters['user'],self.parameters['password'],self.parameters['timeout'],self.parameters['database'],self.log)
-        while(stop != 'n'):
+        while(not stop):
             if(self.mode == 'add'):
-            adm.add_interception()
+                adm.add_interception()
             elif(self.mode == 'rm'):
-            adm.inactivate_interception()
+                adm.inactivate_interception()
 
-            stop = input("Continuar cadastro (y or n) \n")      
+            stop = input("Continuar cadastro (y or n) \n")
+            if(stop == 'y'):
+                stop = False
+            elif(stop == 'n'):
+                stop = True
+            else:
+                stop = input("Digite a opcao correta: Continuar cadastro (y or n) \n")    
 
     def start(self, preserved_file = None):
         if self.service_args.daemon:
@@ -62,7 +68,8 @@ class System():
             'critical': logging.CRITICAL}
 
         self.mode = self.config.get('mode','type')
-        log_name = self.config.get('log','name')
+        log_name = self.config.get('log', 'name')
+
         self.parameters = {'host': self.config.get('general','host'),
                             'port': self.config.get('general','port'),
                             'user': self.config.get('general','user'),
