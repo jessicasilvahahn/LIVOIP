@@ -22,14 +22,13 @@ class Adm(Database):
         self.log.info("Adm::add_interception")
         try:
             (lea_user,lea_password,lea_email,target,date) = self.interface.li_register()
-            url = uris.ADD_INTERCEPTION.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port']  ,target)
+            url = uris.ADD_INTERCEPTION.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port']  ,"?target=" + target)
             self.log.info("Adm::add_interception: Url: " + url)
             (code, json, response) = self.client.http_request(Method.GET,url,False)
             self.log.info("Adm::add_interception: code: " + str(code) + " json: " + str(json))
             if(code == 200):
-                response_dict = json.loads(json)
-                interception_id = int(response_dict['id'])
-                uri = response_dict['uri']
+                interception_id = int(json['id'])
+                uri = json['uri']
                 self.log.info("Adm::add_interception: interception_id: " + str(interception_id) + " uri: " + str(uri))
                 self.target(target,uri)
                 lea_id = self.lea(lea_user,lea_password,lea_email)
@@ -48,7 +47,7 @@ class Adm(Database):
             if(interface):
                 id = self.interface.li_unregister()
             url = uris.INACTIVE_INTERCEPTION
-            url.format(self.client.server_parameters['host'],str(id))
+            url.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port'] ,"?interception=" + str(id))
             (code, json, response) = self.client.http_request(Method.GET,url,False)
             if(code == 200):
                 self.li(id,None,None,Action.UPDATE,'I')
@@ -98,7 +97,7 @@ class Adm(Database):
         query = None
         if(action == Action.INSERT):
             query = "INSERT INTO li VALUES(?,?,?,?)"
-            values = [li_id, cpf, oficio, "\'" + flag + "\'"]
+            values = [li_id, cpf, oficio, flag]
         elif(action == Action.UPDATE):
             query = "UPDATE li SET flag=\'" + flag + "\' where id=" + str(li_id)
             values = None

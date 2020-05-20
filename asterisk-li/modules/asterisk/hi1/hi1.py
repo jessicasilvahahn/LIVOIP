@@ -15,7 +15,7 @@ class Hi1(Database):
         uri = None
         self.log.info("Hi1::search_target: target: " + cpf)
         try:
-            query = "SELECT uri from operadora where cpf=\'" + cpf + '\''
+            query = "SELECT uri from uri where cpf=\'" + cpf + '\''
             self.connect()
             (cursor,conn) = self.execute_query(query)
             uri = cursor.fetchone()
@@ -31,14 +31,14 @@ class Hi1(Database):
         uri = self.search_target(cpf)
         id_interception = None
         if(uri):
-            flag = '\'' + Status.ATIVO.value + '\''
+            flag = Status.ATIVO.value
             query = "INSERT INTO target VALUES(?,?)"
             values = [None,uri]
             self.connect()
             (cursor,conn) = self.execute_query(query,values)
             conn.commit()
             query = "SELECT MAX(id) from target;"
-            (cursor,conn) = self.database.execute_query(query)
+            (cursor,conn) = self.execute_query(query)
             target_id = cursor.fetchone()
             target_id = target_id[0]
             query = "INSERT INTO interception VALUES(?,?,?)"
@@ -46,7 +46,7 @@ class Hi1(Database):
             (cursor,conn) = self.execute_query(query,values)
             conn.commit()
             query = "SELECT MAX(id) from interception;"
-            (cursor,conn) = self.database.execute_query(query)
+            (cursor,conn) = self.execute_query(query)
             id_interception = (cursor.fetchone())[0]
             self.disconnect()
         else:

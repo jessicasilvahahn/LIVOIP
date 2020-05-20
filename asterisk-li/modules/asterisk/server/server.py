@@ -48,77 +48,87 @@ class Handler(BaseHTTPRequestHandler):
         return
     
     def do_GET(self):
-        if(self.headers['Authorization'] == None):
-            self.do_AUTHHEAD()
-            self.wfile.write(bytes('no auth header received', 'UTF-8'))
-            return
+        try:
+            if(self.headers['Authorization'] == None):
+                self.do_AUTHHEAD()
+                self.wfile.write(bytes('no auth header received', 'UTF-8'))
+                return
 
-        credentials = self.headers.get('Authorization')
-        is_auth = self.auth(credentials)
-        if(not is_auth):
-            self.log.warnning("Server::do_GET: Alert: Not auth! , login: " + str(credentials))
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write('Not auth!'.encode('utf-8'))
-            return
-        
-        msg = ""
-        id_interception = None
-        uri = None
-        parsed_path = (parse.urlparse(self.path)).path
-        self.log.debug("Server::do_GET:" + str(parsed_path))
-        if(parsed_path == pcap.uri):
-            if("?" in self.path):
-                for key,value in dict(parse.parse_qsl(self.path.split("?")[1], True)).items():
-                    print(str(key) + str(value))
-                    if(key == 'file'):
-                        name = join(pcap.path,value)
-                        if(exists(name)):
-                            self.HEADER(value)
-                            with open(name, 'rb') as reader:
-                                bytes_line = reader.read()
-                                while(bytes_line):
-                                    self.wfile.write(bytes_line)
+            credentials = self.headers.get('Authorization')
+            is_auth = self.auth(credentials)
+            if(not is_auth):
+                self.log.warnning("Server::do_GET: Alert: Not auth! , login: " + str(credentials))
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write('Not auth!'.encode('utf-8'))
+                return
+            
+            msg = ""
+            id_interception = None
+            uri = None
+            parsed_path = (parse.urlparse(self.path)).path
+            self.log.debug("Server::do_GET: " + str(parsed_path))
+            if(parsed_path == pcap.uri):
+                if("?" in self.path):
+                    for key,value in dict(parse.parse_qsl(self.path.split("?")[1], True)).items():
+                        print(str(key) + str(value))
+                        if(key == 'file'):
+                            name = join(pcap.path,value)
+                            if(exists(name)):
+                                self.HEADER(value)
+                                with open(name, 'rb') as reader:
                                     bytes_line = reader.read()
-                            return
+                                    while(bytes_line):
+                                        self.wfile.write(bytes_line)
+                                        bytes_line = reader.read()
+                                return
+                            else:
+                                msg = "File not exists!"
+            
+            elif(parsed_path == uris.ADD_INTERCEPTION.format("","")):
+                self.log.debug("Server::do_GET: ADD_INTERCEPTION")
+                if("?" in self.path):
+                    for key,value in dict(parse.parse_qsl(self.path.split("?")[1], True)).items():
+                        self.log.debug("Server::do_GET: ADD_INTERCEPTION, " + str(key) + ", " + str(value))
+                        if(key == 'target'):
+                            target = value
+                            (id_interception,uri) = hi1.add_interception(target)
+                            msg = {"id": id_interception,"uri": uri}
                         else:
-                            msg = "File not exists!"
+                            msg = {"error": "Key is not valid!"}
+                        
+                        self.log.debug("Server::do_GET: msg: " + str(msg))
+                        msg_json = (json.dumps(msg)).encode('utf-8')
+                        self.send_response(200)
+                        self.send_header('Content-type','application/json')
+                        self.send_header('Content-Length',str(len(msg_json)))
+                        self.end_headers()
+                        self.wfile.write(msg_json)
+                        return
+
+
+            elif(parsed_path == uris.INACTIVE_INTERCEPTION.format("","")):
+                self.log.debug("Server::do_GET: INACTIVE_INTERCEPTION")
+                if("?" in self.path):
+                    for key,value in dict(parse.parse_qsl(self.path.split("?")[1], True)).items():
+                        self.log.debug("Server::do_GET: INACTIVE_INTERCEPTION, " + str(key) + ", " + str(value))
+                        if(key == 'interception'):
+                            id_interception = int(value)
+                            if(hi1.inactive_interception(id_interception)):
+                                msg = "OK"
+                        else:
+                            msg = "Key is not valid!"
+            else:
+                msg = "Path not exists!"
+                self.log.warning("Server::do_GET: Alert: " + str(msg))
         
-        elif(parsed_path == uris.ADD_INTERCEPTION):
-            self.log.debug("Server::do_GET: ADD_INTERCEPTION")
-            if("?" in self.path):
-                for key,value in dict(parse.parse_qsl(self.path.split("?")[1], True)).items():
-                    self.log.debug("Server::do_GET: ADD_INTERCEPTION, " + str(key) + ", " + str(value))
-                    if(key == 'target'):
-                        target = value
-                        (id_interception,uri) = hi1.add_interception(target)
-                        msg = {"id": id_interception,"uri": uri}
-                    else:
-                        msg = {"error": "Key is not valid!"}
-                    
-                    self.send_response(200)
-                    self.send_header('Content-type','application/json')
-                    self.wfile.write(json.dumps(msg))
-
-
-        elif(parsed_path == uris.INACTIVE_INTERCEPTION):
-            self.log.debug("Server::do_GET: INACTIVE_INTERCEPTION")
-            if("?" in self.path):
-                for key,value in dict(parse.parse_qsl(self.path.split("?")[1], True)).items():
-                    self.log.debug("Server::do_GET: INACTIVE_INTERCEPTION, " + str(key) + ", " + str(value))
-                    if(key == 'interception'):
-                        id_interception = int(value)
-                        if(hi1.inactive_interception(id_interception)):
-                            msg = "OK"
-                    else:
-                        msg = "Key is not valid!"
-        else:
-            msg = "Path not exists!"
-            self.log.warning("Server::do_GET: Alert: " + str(msg))
-    
-        self.send_response(200)
-        self.send_header('Content-type','text/plain')
-        self.wfile.write(msg.encode('utf-8'))
+            self.send_response(200)
+            self.send_header('Content-type','text/plain')
+            self.end_headers()
+            self.wfile.write(msg.encode('utf-8'))
+        
+        except Exception as error:
+            self.log.debug("Server::do_GET: error: " + str(error))
 
     def auth(self,credentials:str):
         credentials_split = credentials.split(" ")
