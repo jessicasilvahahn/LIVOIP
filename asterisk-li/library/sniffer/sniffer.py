@@ -123,7 +123,10 @@ class Sniffer():
 
     def setup(self):
         self.log.info("Sniffer::setup")
-        self.filter = str(self.protocol) + " and port " + str(self.port)
+        if(self.protocol == 'both'):
+            self.filter = "port " + str(self.port)
+        else:
+            self.filter = str(self.protocol) + " and port " + str(self.port)
         self.sip = Sip(self.log)
 
     def start(self):

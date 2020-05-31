@@ -112,7 +112,7 @@ class System():
                 'user': self.config.get('manager','ami_user'),
                 'password': self.config.get('manager','ami_password')}
             
-        self.parameters = {'host': self.config.get('server','address') + ':' + self.config.get('server','port'),
+        self.parameters = {'host': self.config.get('server','external_address') + ':' + self.config.get('server','port'),
                         'sleep': self.config.getint('manager','sleep_time'),
                         'db_name': self.config.get('server','database'),
                         'iri': iri,
