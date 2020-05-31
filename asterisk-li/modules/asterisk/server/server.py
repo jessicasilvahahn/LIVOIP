@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler
 from os.path import exists
 from os.path import join
 import base64
-from modules.asterisk.hi1.hi1 import Hi1
+from modules.asterisk.register.register import Register
 from library.shared.ari import uris
 import json
 
@@ -30,7 +30,7 @@ class Auth():
 
 pcap = Pcap()
 auth  = Auth()
-hi1 = Hi1()
+register = Register()
 
 class Handler(BaseHTTPRequestHandler):
 
@@ -92,7 +92,7 @@ class Handler(BaseHTTPRequestHandler):
                         self.log.debug("Server::do_GET: ADD_INTERCEPTION, " + str(key) + ", " + str(value))
                         if(key == 'target'):
                             target = value
-                            (id_interception,uri) = hi1.add_interception(target)
+                            (id_interception,uri) = register.add_interception(target)
                             msg = {"id": id_interception,"uri": uri}
                         else:
                             msg = {"error": "Key is not valid!"}
@@ -114,7 +114,7 @@ class Handler(BaseHTTPRequestHandler):
                         self.log.debug("Server::do_GET: INACTIVE_INTERCEPTION, " + str(key) + ", " + str(value))
                         if(key == 'interception'):
                             id_interception = int(value)
-                            if(hi1.inactive_interception(id_interception)):
+                            if(register.inactive_interception(id_interception)):
                                 msg = "OK"
                         else:
                             msg = "Key is not valid!"
@@ -146,7 +146,7 @@ class Server(Server):
         self.log = log
         pcap.set(path_pcap,uri)
         auth.set(user, password)
-        hi1.set(log,db_name)
+        register.set(log,db_name)
         super().__init__(address,port,Handler,log)
         
     

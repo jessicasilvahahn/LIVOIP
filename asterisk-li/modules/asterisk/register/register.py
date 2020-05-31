@@ -2,7 +2,7 @@
 from library.shared.database.database import Database
 from library.shared.interception.status import Status
 
-class Hi1(Database):
+class Register(Database):
 
     def __init__(self, log=None, db_name=None):
         pass
@@ -13,7 +13,7 @@ class Hi1(Database):
 
     def search_target(self, cpf:str):
         uri = None
-        self.log.info("Hi1::search_target: target: " + cpf)
+        self.log.info("Register::search_target: target: " + cpf)
         try:
             query = "SELECT uri from uri where cpf=\'" + cpf + '\''
             self.connect()
@@ -21,13 +21,13 @@ class Hi1(Database):
             uri = cursor.fetchone()
             uri = uri[0]
         except Exception as error:
-            self.log.error("Hi1::search_target: error: " + str(error))
+            self.log.error("Register::search_target: error: " + str(error))
         
         self.disconnect()
         return uri
 
     def add_interception(self, cpf:str):
-        self.log.info("Hi1::add_interception: target: " + cpf)
+        self.log.info("Register::add_interception: target: " + cpf)
         uri = self.search_target(cpf)
         id_interception = None
         if(uri):
@@ -50,12 +50,12 @@ class Hi1(Database):
             id_interception = (cursor.fetchone())[0]
             self.disconnect()
         else:
-            self.log.info("Hi1::add_interception: target: " + cpf + " not found!")
+            self.log.info("Register::add_interception: target: " + cpf + " not found!")
         
         return (id_interception,uri)
 
     def inactive_interception(self, id_interception:int):
-        self.log.info("Hi1::inactive_interception: id: " + str(id_interception))
+        self.log.info("Register::inactive_interception: id: " + str(id_interception))
         try:
             self.connect()
             query = "UPDATE interception SET flag=\'" + Status.INATIVO.value + "\' where id=" + str(id_interception)
@@ -64,6 +64,6 @@ class Hi1(Database):
             self.disconnect()
             return True
         except Exception as error:
-            self.log.error("Hi1::inactive_interception: error: " + str(error))
+            self.log.error("Register::inactive_interception: error: " + str(error))
             
 

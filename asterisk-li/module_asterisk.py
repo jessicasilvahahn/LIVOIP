@@ -23,7 +23,6 @@ class System():
         self.mode = None
         self.iri = None
         self.cc = None
-        self.hi1 = None
         self.ali = None
         self.server = None
         self.parameters = {}
