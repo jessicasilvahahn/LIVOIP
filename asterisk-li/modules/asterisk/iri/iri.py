@@ -32,9 +32,9 @@ class Iri(Sniffer):
         self.log.info("Iri::write_pcap")
         self.log.info("Iri::write_pcap: Packets: " + str(packets))
         self.log.info("Iri::write_pcap: proxy: " + str((packets['proxy'])))
-        name_pcap = (packets['Call-ID'])[0:20] + ".pcap"
+        name_pcap = ((packets['Call-ID']).strip())[0:20] + ".pcap"
         if(packets['proxy']):
-            name_pcap = (packets['proxy'])[0:20] + ".pcap.B"
+            name_pcap = ((packets['proxy']).strip())[0:20] + ".pcap.B"
        
         name_pcap = name_pcap.replace("\r","")
         name_pcap = name_pcap.replace(" ","")
