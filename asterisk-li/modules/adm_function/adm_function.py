@@ -1,5 +1,4 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
-from modules.adm_function.user_interface.simple.interface import Interface
 from library.shared.database.database import Database
 from library.shared.ari.http import Http
 from library.shared.ari.http import Method
@@ -12,16 +11,19 @@ class Action(Enum):
     UPDATE = 1
 
 class Adm(Database):
-    def __init__(self, host, port, user, password, timeout, db_name, log):
+
+    def __init__(self):
+        self.log = None
+        self.client = None
+
+    def set_attributes(self, host, port, user, password, timeout, db_name, log):
         self.log = log
-        self.interface = Interface()
         super().__init__(db_name,log)
         self.client = Http(host, port, user, password, timeout)
     
-    def add_interception(self):
+    def add_interception(self,lea_user,lea_password,lea_email,target,date):
         self.log.info("Adm::add_interception")
         try:
-            (lea_user,lea_password,lea_email,target,date) = self.interface.li_register()
             url = uris.ADD_INTERCEPTION.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port']  ,"?target=" + target)
             self.log.info("Adm::add_interception: Url: " + url)
             (code, json, response) = self.client.http_request(Method.GET,url,False)
@@ -41,11 +43,9 @@ class Adm(Database):
         except Exception as error:
             self.log.error("Adm::add_interception: error: " + str(error))
 
-    def inactivate_interception(self,id=None,interface=True):
+    def inactivate_interception(self,id):
         self.log.info("Adm::inactivate_interception")
         try:
-            if(interface):
-                id = self.interface.li_unregister()
             url = uris.INACTIVE_INTERCEPTION
             url.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port'] ,"?interception=" + str(id))
             (code, json, response) = self.client.http_request(Method.GET,url,False)

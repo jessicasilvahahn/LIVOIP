@@ -18,14 +18,11 @@ class System():
         self.service_args = None
         self.log_handler = None
         self.stop = False
-        self.mode = None
         self.manager = None
-        self.server = None
         self.parameters = {}
 
     def run(self):
-        if(self.mode == 'manager'):
-            self.manager = Manager((self.parameters['ami'])['server'],
+        self.manager = Manager((self.parameters['ami'])['server'],
             (self.parameters['ami'])['user'],
             (self.parameters['ami'])['password'],
             self.parameters['iri'],
@@ -36,17 +33,8 @@ class System():
             self.parameters['db_name'],
             self.log)
 
-            self.manager.setup()
-            self.manager.run()
-    
-        elif(self.mode == 'server'):
-            self.server = Server((self.parameters['server'])['address'],
-            (self.parameters['server'])['port'],
-            self.parameters['db_name'],
-            (self.parameters['server'])['path'],
-            self.log)
-
-            self.server.run()            
+        self.manager.setup()
+        self.manager.run()
 
     def start(self, preserved_file = None):
         if self.service_args.daemon:
@@ -78,11 +66,7 @@ class System():
             'error': logging.ERROR,
             'critical': logging.CRITICAL}
 
-        self.mode = self.config.get('mode','type')
-        log_name = self.config.get('server','log_name')
-
-        if(self.mode == 'manager'):
-            log_name = self.config.get('manager','log_name')
+        log_name = self.config.get('manager','log_name')
 
         iri = {'path_iri': self.config.get('iri','path'),
             'buffer': self.config.getint('iri','buffer'),
@@ -104,22 +88,17 @@ class System():
         email = {'address': self.config.get('manager','email_address'),
             'passwd': self.config.get('manager','email_password')}
 
-        server = {'path': self.config.get('server','path'),
-                'address': self.config.get('server','address'),
-                'port': self.config.getint('server','port')}
-
         ami = {'server': self.config.get('manager','ami_server'),
                 'user': self.config.get('manager','ami_user'),
                 'password': self.config.get('manager','ami_password')}
             
         self.parameters = {'host': self.config.get('server','external_address') + ':' + self.config.get('server','port'),
                         'sleep': self.config.getint('manager','sleep_time'),
-                        'db_name': self.config.get('server','database'),
+                        'db_name': self.config.get('manager','database'),
                         'iri': iri,
                         'cc': cc,
                         'email': email,
-                        'ami': ami,
-                        'server': server}
+                        'ami': ami}
 
 
         self.log_handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=self.config.getint('log', 'size'),
