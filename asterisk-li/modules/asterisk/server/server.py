@@ -1,12 +1,12 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from urllib import parse
-from library.shared.ari.server import Server
+from library.ari.server import Server
 from http.server import BaseHTTPRequestHandler
 from os.path import exists
 from os.path import join
 import base64
 from modules.asterisk.register.register import Register
-from library.shared.ari import uris
+from library.ari import uris
 import json
 
 class Pcap():

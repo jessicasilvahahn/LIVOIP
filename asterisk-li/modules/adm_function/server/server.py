@@ -1,12 +1,12 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from modules.adm_function.adm_function import Adm
 from urllib import parse
-from library.shared.ari.server import Server
-from library.shared.ari.server import MimeType
+from library.ari.server import Server
+from library.ari.server import MimeType
 from http.server import BaseHTTPRequestHandler
 from os.path import exists
 from os.path import join
-from library.shared.database.database import Database
+from library.database.database import Database
 import base64
 import cgi
 import paramiko

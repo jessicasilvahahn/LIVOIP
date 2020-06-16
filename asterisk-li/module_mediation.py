@@ -8,9 +8,7 @@ import sys
 import signal
 import daemon
 from daemon.pidfile import PIDLockFile
-from modules.mediation_function.manager.manager import Manager
-from modules.mediation_function.server.server import Server
-
+from modules.mediation_function.mediation_function import Mf
 class System():
     
     def __init__(self):
@@ -18,11 +16,11 @@ class System():
         self.service_args = None
         self.log_handler = None
         self.stop = False
-        self.manager = None
+        self.mf = None
         self.parameters = {}
 
     def run(self):
-        self.manager = Manager((self.parameters['ami'])['server'],
+        self.mf = Mf((self.parameters['ami'])['server'],
             (self.parameters['ami'])['user'],
             (self.parameters['ami'])['password'],
             self.parameters['iri'],
@@ -33,8 +31,8 @@ class System():
             self.parameters['db_name'],
             self.log)
 
-        self.manager.setup()
-        self.manager.run()
+        self.mf.setup()
+        self.mf.run()
 
     def start(self, preserved_file = None):
         if self.service_args.daemon:
@@ -42,10 +40,6 @@ class System():
                 self.run()
         else:
             self.run()
-
-    def stop(self):
-        if(self.ali):
-            self.ali.stop()
 
     def setup(self):
         parser = argparse.ArgumentParser(description='Allowed options')
@@ -66,7 +60,7 @@ class System():
             'error': logging.ERROR,
             'critical': logging.CRITICAL}
 
-        log_name = self.config.get('manager','log_name')
+        log_name = self.config.get('general','log_name')
 
         iri = {'path_iri': self.config.get('iri','path'),
             'buffer': self.config.getint('iri','buffer'),
@@ -85,16 +79,16 @@ class System():
             'password': self.config.get('cc','password'),
             'timeout': self.config.getint('cc','timeout')}
 
-        email = {'address': self.config.get('manager','email_address'),
-            'passwd': self.config.get('manager','email_password')}
+        email = {'address': self.config.get('general','email_address'),
+            'passwd': self.config.get('general','email_password')}
 
-        ami = {'server': self.config.get('manager','ami_server'),
-                'user': self.config.get('manager','ami_user'),
-                'password': self.config.get('manager','ami_password')}
+        ami = {'server': self.config.get('general','ami_server'),
+                'user': self.config.get('general','ami_user'),
+                'password': self.config.get('general','ami_password')}
             
         self.parameters = {'host': self.config.get('server','external_address') + ':' + self.config.get('server','port'),
-                        'sleep': self.config.getint('manager','sleep_time'),
-                        'db_name': self.config.get('manager','database'),
+                        'sleep': self.config.getint('general','sleep_time'),
+                        'db_name': self.config.get('general','database'),
                         'iri': iri,
                         'cc': cc,
                         'email': email,

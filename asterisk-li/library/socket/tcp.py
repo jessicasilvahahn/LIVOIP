@@ -41,13 +41,11 @@ class Server():
         self.host = host
         self.port = port
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.timeout = 10
         self.buffer_size = buffer_size
     
     def start(self):
         self.log.info("Trying bind socket: " + str(self.host) + " " + str(self.port))
         try:
-            #self.server.settimeout(self.timeout)
             self.server.bind((self.host,self.port))
             self.server.listen(1)
         except Exception as error:

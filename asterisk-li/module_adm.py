@@ -32,10 +32,6 @@ class System():
         else:
             self.run()
 
-    def stop(self):
-        if(self.ali):
-            self.ali.stop()
-
     def setup(self):
         parser = argparse.ArgumentParser(description='Allowed options')
         parser.add_argument('-c', '--config',

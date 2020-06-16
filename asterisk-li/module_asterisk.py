@@ -8,7 +8,7 @@ import sys
 import signal
 import daemon
 from daemon.pidfile import PIDLockFile
-from modules.asterisk.ali import Ali
+from modules.asterisk.asterisk import Asterisk
 from modules.asterisk.iri.iri import Iri
 from modules.asterisk.cc.cc import Record
 from modules.asterisk.server.server import Server
@@ -23,14 +23,14 @@ class System():
         self.mode = None
         self.iri = None
         self.cc = None
-        self.ali = None
+        self.asterisk = None
         self.server = None
         self.parameters = {}
 
     def run(self):
-        if(self.mode == 'ali'):
-            self.ali = Ali(self.parameters['database'], self.parameters['sleep'], self.log)
-            self.ali.start(self.parameters['iri_host'],self.parameters['iri_port'], self.parameters['cc_host'],self.parameters['cc_port'])
+        if(self.mode == 'asterisk'):
+            self.asterisk = Asterisk(self.parameters['database'], self.parameters['sleep'], self.log)
+            self.asterisk.start(self.parameters['iri_host'],self.parameters['iri_port'], self.parameters['cc_host'],self.parameters['cc_port'])
         
         elif(self.mode == 'iri'):
             self.iri = Iri(self.parameters['interface'],self.parameters['protocol'],self.parameters['sip'], self.parameters['pcap'], self.parameters['host'], self.parameters['port'], self.parameters['buffer'], self.parameters['sleep'], self.log)
@@ -52,8 +52,8 @@ class System():
             self.run()
 
     def stop(self):
-        if(self.ali):
-            self.ali.stop()
+        if(self.asterisk):
+            self.asterisk.stop()
 
     def setup(self):
         parser = argparse.ArgumentParser(description='Allowed options')
@@ -82,14 +82,14 @@ class System():
         cc_port = self.config.getint('cc','port')
         log_name = None
 
-        if(self.mode == 'ali'):
-            log_name = self.config.get('ali','log_name')
-            self.parameters = {'sleep': self.config.getint('ali','sleep_interval'), 
-            'log': self.config.get('ali','log_name'), 
-            'database': self.config.get('ali','database'),
-            'iri_host': self.config.get('ali','host'),
+        if(self.mode == 'asterisk'):
+            log_name = self.config.get('asterisk','log_name')
+            self.parameters = {'sleep': self.config.getint('asterisk','sleep_interval'), 
+            'log': self.config.get('asterisk','log_name'), 
+            'database': self.config.get('asterisk','database'),
+            'iri_host': self.config.get('asterisk','host'),
             'iri_port': iri_port,
-            'cc_host': self.config.get('ali','host'),
+            'cc_host': self.config.get('asterisk','host'),
             'cc_port': cc_port} 
         
         elif(self.mode == 'iri'):

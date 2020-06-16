@@ -1,8 +1,8 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from scapy.all import sniff
 import threading
-from library.shared.sip.sip import Sip
-from library.shared.sip.sip import Message
+from library.sip.sip import Sip
+from library.sip.sip import Message
 from queue import Queue
 
 class Sniffer():

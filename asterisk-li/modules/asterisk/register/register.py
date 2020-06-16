@@ -1,6 +1,6 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
-from library.shared.database.database import Database
-from library.shared.interception.status import Status
+from library.database.database import Database
+from library.interception.status import Status
 
 class Register(Database):
 

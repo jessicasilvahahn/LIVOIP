@@ -1,8 +1,8 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
-from library.shared.database.database import Database
-from library.shared.ari.http import Http
-from library.shared.ari.http import Method
-from library.shared.ari import uris
+from library.database.database import Database
+from library.ari.http import Http
+from library.ari.http import Method
+from library.ari import uris
 import json
 from enum import Enum
 
