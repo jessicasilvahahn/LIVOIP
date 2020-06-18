@@ -9,23 +9,14 @@ from os.path import join
 from library.database.database import Database
 import base64
 import cgi
-import paramiko
 import os
 
 class UriEvidences():
     def __init__(self):
         self.path = None
-        self.user_sftp = None
-        self.password_sftp = None
-        self.host_sftp = None
-        self.mode = None
 
-    def set(self,path, host_sftp, user_sftp, password_sftp, mode):
+    def set(self,path):
         self.path = path
-        self.user_sftp = user_sftp
-        self.password_sftp = password_sftp
-        self.host_sftp = host_sftp
-        self.mode = mode
 
 
 database = Database()
@@ -99,9 +90,9 @@ class Handler(BaseHTTPRequestHandler):
                 </form>
             </html>'''
 
-            self.wfile.write(form.encode('utf-8'))
+        self.wfile.write(form.encode('utf-8'))
 
-    def login(self,target,file):
+    def login_get(self,target,file):
         self.HEADER(MimeType.HTML)
         form = '''<html><form action="" method="GET">
             User Name :
@@ -118,7 +109,7 @@ class Handler(BaseHTTPRequestHandler):
 
         self.wfile.write(form.encode('utf-8'))
     
-    def login(self):
+    def login_post(self):
         self.HEADER(MimeType.HTML)
         form = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "https://www.w3.org/TR/html4/strict.dtd">
@@ -176,12 +167,12 @@ class Handler(BaseHTTPRequestHandler):
                     elif(lea_user and lea_password and lea_email and cpf and date):
                         adm.add_interception(lea_user, lea_password, lea_email, cpf, date)
             else:
-                self.login()
+                self.login_post()
         except Exception as error:
             self.log.warning("Server::do_GET: Alert: " + str(error))
             self.user = None
             self.password = None
-            self.login()
+            self.login_post()
 
     def do_GET(self):
         self.user = None
@@ -207,19 +198,17 @@ class Handler(BaseHTTPRequestHandler):
 
                 path = join(uri_evidences.path + '/' + str(cpf), file)
                 self.log.debug("Server::do_GET: mode: " + str(uri_evidences.mode)
-                if(uri_evidences.mode == 'abnt'):
-                    self.get_file(path)
-                else:
-                    mime_type = MimeType.TEXT
-                    is_pcap = file.split(".")
-                    if(is_pcap[0] == "wav"):
-                        mime_type = MimeType.AUDIO
-                    self.get_file(path,mime_type,file)
+                
+                mime_type = MimeType.TEXT
+                is_pcap = file.split(".")
+                if(is_pcap[0] == "wav"):
+                    mime_type = MimeType.AUDIO
+                self.get_file(path,mime_type,file)
             else:
-                self.login(cpf,file)
+                self.login_get(cpf,file)
         except Exception as error:
             self.log.warning("Server::do_GET: Alert: " + str(error))
-            self.login(cpf,file)
+            self.login_get(cpf,file)
 
     def auth(self):
         auth = False
@@ -255,32 +244,11 @@ class Handler(BaseHTTPRequestHandler):
                     bytes_line = reader.read()
         return
 
-    def get_file(self,path:str):
-        self.log.debug("Server::get_file: Trying get file: " + str(path))
-        transport = None
-        local_path = None
-        try:
-            if(exists(path)):
-                transport = self.setup_sftp()
-                self.log.debug("Server::get_file: setup sftp: " + str(transport))
-                sftp = paramiko.SFTPClient.from_transport(transport)
-                self.log.debug("Server::get_file: Trying download file")
-                local_path = os.getcwd()
-                self.log.debug("Server::get_file: local path: " + str(local_path))
-                sftp.get(path,local_path)
-                #close
-                    if(sftp): 
-                        sftp.close()
-                    if(transport): 
-                        transport.close()
-        except Exception as error:
-            self.log.error("Server::get_file: Error: " + str(error))
-
 class Server(Server):
-    def __init__(self, address, port, db_name, path, host_asterisk, port_asterisk, user_asterisk, password_asterisk, timeout, host_sftp, user_sftp, password_sftp, mode, log):
+    def __init__(self, address, port, db_name, path, host_asterisk, port_asterisk, user_asterisk, password_asterisk, timeout, log):
         self.log = log
         adm.set_attributes(host_asterisk, port_asterisk, user_asterisk, password_asterisk, timeout, db_name, log)
-        uri_evidences.set(path, host_sftp, user_sftp, password_sftp, mode)
+        uri_evidences.set(path)
         database.set_attributes(db_name,log)
         super().__init__(address,port,Handler,log)
 

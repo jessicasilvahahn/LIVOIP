@@ -22,7 +22,7 @@ class System():
         self.server = None
 
     def run(self):
-        self.server = Server(self.parameters['address'],self.parameters['port'],self.parameters['database'],self.parameters['path'],self.parameters['host_asterisk'],self.parameters['port_asterisk'],self.parameters['user_asterisk'],self.parameters['password_asterisk'],self.parameters['timeout'],self.parameters['host_sftp'],self.parameters['user_sftp'],self.parameters['password_sftp'],self.mode,self.log)
+        self.server = Server(self.parameters['address'],int(self.parameters['port']),self.parameters['database'],self.parameters['path'],self.parameters['host_asterisk'],self.parameters['port_asterisk'],self.parameters['user_asterisk'],self.parameters['password_asterisk'],self.parameters['timeout'],self.log)
         self.server.run() 
 
     def start(self, preserved_file = None):

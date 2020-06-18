@@ -19,9 +19,11 @@ import threading
 import time
 from os.path import split
 from heapq import merge
+import subprocess
 
 class Evidences():
-    def __init__(self, iri:dict, cc:dict, email:dict, host:str, log, database):
+    def __init__(self, iri:dict, cc:dict, email:dict, host:str, log, database, mode):
+        self.mode = mode
         self.log = log
         self.path_iri = iri['path_iri']
         self.path_cc = cc['path_cc']
@@ -212,14 +214,71 @@ class Evidences():
                     if(state_iri and state_cc):
                         self.log.debug("Evidences::get_evidences: evidences (iri and cc) founded!")
                         urls = {'url_iri': url_iri + '?file=' + str(iri) + "&target=" + str(targets[0]),'url_cc': url_cc + '?file=' + str(cc) + "&target=" + str(targets[0]), 'cpf': targets[0]}
-                        self.alert_lea((targets[1])['lea'],urls,(targets[1])['cdr_targets_id'])
+                        self.alert_lea((targets[1])['lea'],urls,(targets[1])['cdr_targets_id'],iri,cc)
                     else:
                         self.alerted_targets.remove(targets[0])
                         self.log.warning("Evidences::get_evidences: evidences (iri and cc) not found")
             self.log.info("Evidences::get_evidences: Sleeping ... ")
             time.sleep(3)
 
-    def alert_lea(self, leas:list, urls:dict,cdr_targets_id:int):
+    def abnt(self,lea:int, iri:str, cc:str):
+        self.log.info("Evidences::abnt")
+        user = None
+        password = None
+        stdout = None
+        stderr = None
+        #criar diretorio
+        lea_dir = join(self.path_iri,str(lea))
+        self.log.info("Evidences::abnt: Trying create lea dir: " + str(lea_dir))
+        if(not exists(lea_dir)):
+            makedirs(lea_dir)
+        
+        query = "SELECT user,password from lea where id=" + str(lea)
+        (cursor,conn) = self.database.execute_query(query)
+        (user,password) = cursor.fetchone()
+        self.log.debug("Evidences::abnt: user, password: " + str(user) + "," + str(password))
+        if(user and password):
+            self.log.info("Evidences::abnt: Trying create user: " + str(user))
+            #criar usuário
+            cmd = "useradd -d " + str(lea_dir) + " " + str(user)
+            process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            (stdout, stderr) = process.communicate()
+            if(stderr):
+                self.log.error("Evidences::abnt: error to create lea user: " + str(stderr))
+                return False
+            
+            self.log.info("Evidences::abnt: stdout: " + str(stdout))
+            self.log.debug("Evidences::abnt: Trying change password: " + str(password))
+            cmd = "echo " + str(user) + ":" + str(password) + " | chpasswd"
+            process = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            (stdout, stderr) = process.communicate()
+            if(stderr):
+                self.log.error("Evidences::abnt: error to update password: " + str(stderr))
+                return False
+            
+            #chown lea dir
+            self.log.debug("Evidences::abnt: Trying chown lea dir")
+            cmd = "chown -R " + str(user) + "." + str(user) + " " + str(lea_dir)
+            process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            (stdout, stderr) = process.communicate()
+            if(stderr):
+                self.log.error("Evidences::abnt: error: " + str(stderr))
+                return False
+
+        #mover arquivos para o diretorio
+        iri_file = join(self.path_iri, iri)
+        cc_file = join(self.path_cc,cc)
+        cmd = "cp -p " + str(iri_file) + " " + str(cc_file) + " " + str(lea_dir)
+        process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        (stdout, stderr) = process.communicate()
+        if(stderr):
+            self.log.error("Evidences::abnt: error: " + str(stderr))
+            return False
+        
+        return True
+
+
+    def alert_lea(self, leas:list, urls:dict,cdr_targets_id:int,iri,cc):
         self.log.info("Evidences::alert_lea")
         try:
             self.database.connect()
@@ -231,10 +290,24 @@ class Evidences():
                 email = email[0]
                 self.log.info("Evidences::alert_lea: Lea: " + str(email))
                 content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap: <a href=\"" + urls['url_iri'] + "\">" + urls['cpf'] + ".pcap" + "</a> <p> <br> <p>Audio: <a href=\"" + urls['url_cc'] + "\">" + urls['cpf'] + ".wav" + "</a><p>"
+                if(self.mode == "abnt"):
+                    if(not self.abnt(lea,iri,cc)):
+                        return
+                              
+                    content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap: " + str(iri) + "<p> <br> <p>Audio: " + str(cc) + "<p> <br> Para ter acesso a essas evidencias acesse o servidor " + str(self.host) + " port sftp atraves da porta 2222"
+                
                 subject = "[Investigacao] ALERT: Novas evidencias do alvo " + str(urls['cpf'])
                 self.log.info("Evidences::alert_lea: Content: " + str(content) + " ,subject: " + str(subject))
                 self.email.send(email,subject,content)
                 self.change_state(lea,urls['cpf'],cdr_targets_id)
+
+            iri_file = join(self.path_iri, iri)
+            cc_file = join(self.path_cc,cc)
+            cmd = "rm " + str(iri_file) + " " + str(cc_file)
+            process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            (stdout, stderr) = process.communicate()
+            if(stderr):
+                self.log.error("Evidences::abnt: error: " + str(stderr))
         
         except Exception as error:
             self.log.error("Evidences::alert_lea: Error: " + str(error))
