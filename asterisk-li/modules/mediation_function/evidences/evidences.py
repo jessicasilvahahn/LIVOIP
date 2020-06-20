@@ -225,7 +225,7 @@ class Evidences():
             self.log.info("Evidences::get_evidences: Sleeping ... ")
             time.sleep(3)
 
-    def abnt(self,lea:int, iri:str, cc:str):
+    def abnt(self,lea:int, iri:str, cc:str, target:str):
         self.log.info("Evidences::abnt")
         user = None
         password = None
@@ -270,8 +270,8 @@ class Evidences():
                     return False
 
         #mover arquivos para o diretorio
-        iri_file = join(self.path_iri, iri)
-        cc_file = join(self.path_cc,cc)
+        iri_file = join(self.path_iri, iri + '/' + target)
+        cc_file = join(self.path_cc,cc + '/' + target)
         cmd = "cp -p " + str(iri_file) + " " + str(cc_file) + " " + str(lea_dir)
         process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = process.communicate()
@@ -295,7 +295,7 @@ class Evidences():
                 self.log.info("Evidences::alert_lea: Lea: " + str(email))
                 content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap: <a href=\"" + urls['url_iri'] + "\">" + urls['cpf'] + ".pcap" + "</a> <p> <br> <p>Audio: <a href=\"" + urls['url_cc'] + "\">" + urls['cpf'] + ".wav" + "</a><p>"
                 if(self.mode == "abnt"):
-                    if(not self.abnt(lea,iri,cc)):
+                    if(not self.abnt(lea,iri,cc,str(urls['cpf'])):
                         return
                               
                     content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap: " + str(iri) + "<p> <br> <p>Audio: " + str(cc) + "<p> <br> Para ter acesso a essas evidencias acesse o servidor " + str(self.host) + " port sftp atraves da porta 2222"
