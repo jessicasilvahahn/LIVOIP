@@ -27,10 +27,10 @@ class Evidences():
         self.log = log
         self.path_iri = iri['path_iri']
         if(not exists(self.path_iri)):
-            makedirs(path_iri)
+            makedirs(self.path_iri)
         self.path_cc = cc['path_cc']
         if(not exists(self.path_cc)):
-            makedirs(path_cc)
+            makedirs(self.path_cc)
         self.database = database
         self.iri_buffer = iri['buffer']
         self.cc_buffer = cc['buffer']
