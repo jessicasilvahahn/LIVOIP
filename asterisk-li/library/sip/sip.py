@@ -62,7 +62,7 @@ class Sip():
         message = None
         match = re.findall("^SIP/2.0 180 Ringing", packet)
         if(match):
-            self.log.info("Sip::trying: It's Ringing")
+            self.log.info("Sip::ringing: It's Ringing")
             message = Message.RINGING.value
         
         return message

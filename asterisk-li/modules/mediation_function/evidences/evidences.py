@@ -166,7 +166,7 @@ class Evidences():
                 for cpf,id in targets:
                     if(not cpf in self.alerted_targets):
                         
-                        self.alerted_targets.append(cpf)
+                        self.alerted_targets.append(id)
                         self.log.info("Evidences::get_targets: alerted_targets: " + str(self.alerted_targets))
                         query = "SELECT oficio from li where target_id=\'" + str(cpf) + "\' and flag=\'A\'"
                         (cursor,conn) = self.database.execute_query(query)
@@ -220,7 +220,7 @@ class Evidences():
                         urls = {'url_iri': url_iri + '?file=' + str(iri) + "&target=" + str(targets[0]),'url_cc': url_cc + '?file=' + str(cc) + "&target=" + str(targets[0]), 'cpf': targets[0]}
                         self.alert_lea((targets[1])['lea'],urls,(targets[1])['cdr_targets_id'],iri,cc)
                     else:
-                        self.alerted_targets.remove(targets[0])
+                        self.alerted_targets.remove((targets[1])['cdr_targets_id'])
                         self.log.warning("Evidences::get_evidences: evidences (iri and cc) not found")
             self.log.info("Evidences::get_evidences: Sleeping ... ")
             time.sleep(3)
@@ -254,7 +254,7 @@ class Evidences():
                 self.log.info("Evidences::abnt: stdout: " + str(stdout))
                 self.log.debug("Evidences::abnt: Trying change password: " + str(password))
                 cmd = "echo " + str(user) + ":" + str(password) + " | chpasswd"
-                process = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
                 (stdout, stderr) = process.communicate()
                 if(stderr):
                     self.log.error("Evidences::abnt: error to update password: " + str(stderr))
@@ -263,7 +263,7 @@ class Evidences():
                 #chown lea dir
                 self.log.debug("Evidences::abnt: Trying chown lea dir")
                 cmd = "chown root:root " + str(lea_dir)
-                process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 (stdout, stderr) = process.communicate()
                 if(stderr):
                     self.log.error("Evidences::abnt: error: " + str(stderr))
@@ -273,7 +273,7 @@ class Evidences():
         iri_file = join(self.path_iri, iri)
         cc_file = join(self.path_cc,cc)
         cmd = "cp -p " + str(iri_file) + " " + str(cc_file) + " " + str(lea_dir)
-        process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = process.communicate()
         if(stderr):
             self.log.error("Evidences::abnt: error: " + str(stderr))
@@ -308,10 +308,10 @@ class Evidences():
             iri_file = join(self.path_iri, iri)
             cc_file = join(self.path_cc,cc)
             cmd = "rm " + str(iri_file) + " " + str(cc_file)
-            process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             (stdout, stderr) = process.communicate()
             if(stderr):
-                self.log.error("Evidences::abnt: error: " + str(stderr))
+                self.log.error("Evidences::alert_lea: error: " + str(stderr))
         
         except Exception as error:
             self.log.error("Evidences::alert_lea: Error: " + str(error))
@@ -325,7 +325,7 @@ class Evidences():
         (cursor,conn) = self.database.execute_query(query)
         conn.commit()
         self.database.disconnect()
-        self.alerted_targets.remove(target_id)
+        self.alerted_targets.remove(cdr_targets_id)
         self.log.info("Evidences::change_state: alerted_targets: " + str(self.alerted_targets))
 
 
