@@ -270,8 +270,8 @@ class Evidences():
                     return False
 
         #mover arquivos para o diretorio
-        iri_file = join(self.path_iri, iri + '/' + target)
-        cc_file = join(self.path_cc,cc + '/' + target)
+        iri_file = join(self.path_iri + '/' + target, iri)
+        cc_file = join(self.path_cc + '/' + target,cc)
         cmd = "cp -p " + str(iri_file) + " " + str(cc_file) + " " + str(lea_dir)
         process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = process.communicate()
