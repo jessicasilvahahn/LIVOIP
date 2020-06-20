@@ -295,7 +295,7 @@ class Evidences():
                 self.log.info("Evidences::alert_lea: Lea: " + str(email))
                 content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap: <a href=\"" + urls['url_iri'] + "\">" + urls['cpf'] + ".pcap" + "</a> <p> <br> <p>Audio: <a href=\"" + urls['url_cc'] + "\">" + urls['cpf'] + ".wav" + "</a><p>"
                 if(self.mode == "abnt"):
-                    if(not self.abnt(lea,iri,cc,urls['cpf']):
+                    if(not self.abnt(lea,iri,cc,urls['cpf'])):
                         return
                               
                     content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + urls['cpf'] + "<p><br> <p> Pcap: " + str(iri) + "<p> <br> <p>Audio: " + str(cc) + "<p> <br> Para ter acesso a essas evidencias acesse o servidor " + str(self.host) + " port sftp atraves da porta 2222"
