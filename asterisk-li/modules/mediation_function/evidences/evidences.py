@@ -233,37 +233,37 @@ class Evidences():
         if(not exists(lea_dir)):
             makedirs(lea_dir)
         
-        query = "SELECT user,password from lea where id=" + str(lea)
-        (cursor,conn) = self.database.execute_query(query)
-        (user,password) = cursor.fetchone()
-        self.log.debug("Evidences::abnt: user, password: " + str(user) + "," + str(password))
-        if(user and password):
-            self.log.info("Evidences::abnt: Trying create user: " + str(user))
-            #criar usuário
-            cmd = "useradd -d " + str(lea_dir) + " " + str(user)
-            process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            (stdout, stderr) = process.communicate()
-            if(stderr):
-                self.log.error("Evidences::abnt: error to create lea user: " + str(stderr))
-                return False
-            
-            self.log.info("Evidences::abnt: stdout: " + str(stdout))
-            self.log.debug("Evidences::abnt: Trying change password: " + str(password))
-            cmd = "echo " + str(user) + ":" + str(password) + " | chpasswd"
-            process = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-            (stdout, stderr) = process.communicate()
-            if(stderr):
-                self.log.error("Evidences::abnt: error to update password: " + str(stderr))
-                return False
-            
-            #chown lea dir
-            self.log.debug("Evidences::abnt: Trying chown lea dir")
-            cmd = "chown -R " + str(user) + "." + str(user) + " " + str(lea_dir)
-            process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            (stdout, stderr) = process.communicate()
-            if(stderr):
-                self.log.error("Evidences::abnt: error: " + str(stderr))
-                return False
+            query = "SELECT user,password from lea where id=" + str(lea)
+            (cursor,conn) = self.database.execute_query(query)
+            (user,password) = cursor.fetchone()
+            self.log.debug("Evidences::abnt: user, password: " + str(user) + "," + str(password))
+            if(user and password):
+                self.log.info("Evidences::abnt: Trying create user: " + str(user))
+                #criar usuário
+                cmd = "useradd -G group_sftp -d " + str(lea_dir) + " " + str(user)
+                process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                (stdout, stderr) = process.communicate()
+                if(stderr):
+                    self.log.error("Evidences::abnt: error to create lea user: " + str(stderr))
+                    return False
+                
+                self.log.info("Evidences::abnt: stdout: " + str(stdout))
+                self.log.debug("Evidences::abnt: Trying change password: " + str(password))
+                cmd = "echo " + str(user) + ":" + str(password) + " | chpasswd"
+                process = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                (stdout, stderr) = process.communicate()
+                if(stderr):
+                    self.log.error("Evidences::abnt: error to update password: " + str(stderr))
+                    return False
+                
+                #chown lea dir
+                self.log.debug("Evidences::abnt: Trying chown lea dir")
+                cmd = "chown root:root " + str(lea_dir)
+                process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                (stdout, stderr) = process.communicate()
+                if(stderr):
+                    self.log.error("Evidences::abnt: error: " + str(stderr))
+                    return False
 
         #mover arquivos para o diretorio
         iri_file = join(self.path_iri, iri)
