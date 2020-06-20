@@ -26,7 +26,11 @@ class Evidences():
         self.mode = mode
         self.log = log
         self.path_iri = iri['path_iri']
+        if(not exists(self.path_iri)):
+            makedirs(path_iri)
         self.path_cc = cc['path_cc']
+        if(not exists(self.path_cc)):
+            makedirs(path_cc)
         self.database = database
         self.iri_buffer = iri['buffer']
         self.cc_buffer = cc['buffer']
@@ -241,7 +245,7 @@ class Evidences():
                 self.log.info("Evidences::abnt: Trying create user: " + str(user))
                 #criar usuário
                 cmd = "useradd -G group_sftp -d " + str(lea_dir) + " " + str(user)
-                process = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 (stdout, stderr) = process.communicate()
                 if(stderr):
                     self.log.error("Evidences::abnt: error to create lea user: " + str(stderr))
