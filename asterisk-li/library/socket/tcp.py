@@ -24,7 +24,7 @@ class Client():
             self.connect()
             data = pickle.dumps(msg)
             self.log.info("Client::send_message: Trying send: " + str(data))
-            self.client.send(data)
+            self.client.sendall(data)
         except Exception as error:
             self.log.error(str(error))
     
@@ -59,15 +59,18 @@ class Server():
         try:
             (conn, client) = self.server.accept()
             self.log.info("Server::receive_msg: client " + str(client) + " connected")
-            while(current_msg != "ACK"):
+            while(True):
                 current_msg = conn.recv(self.buffer_size)
                 if(current_msg):
                     current_msg = pickle.loads(current_msg)
                     self.log.info("Server::receive_msg: client " + str(client) + " msg " + str(current_msg))
                 if(current_msg == "ACK"):
                     self.log.info("Server::receive_msg: client " + str(client) + " send ACK")
-                else:
+                    break
+                elif(current_msg):
                     msg = current_msg
+                else:
+                    break
             self.log.info("Server::receive_msg: Connection wiht client " + str(client) + " finished")
             conn.close()
             return msg
