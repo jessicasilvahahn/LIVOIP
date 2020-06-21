@@ -22,7 +22,7 @@ from heapq import merge
 import subprocess
 
 class Evidences():
-    def __init__(self, iri:dict, cc:dict, email:dict, host:str, log, database, mode):
+    def __init__(self, iri:dict, cc:dict, email:dict, host:str, log, database, mode:str, path:str):
         self.mode = mode
         self.log = log
         self.path_iri = iri['path_iri']
@@ -44,6 +44,7 @@ class Evidences():
         self.targets_thread = None
         self.evidences = None
         self.alerted_targets = []
+        self.path = path
 
     def create_dir(self, path, dir):
         path_dir = join(path,dir)
@@ -261,6 +262,7 @@ class Evidences():
                     return False
 
         #mover arquivos para o diretorio
+        self.log.debug("Evidences::abnt: Trying move files")
         iri_file = join(self.path_iri + '/' + target, iri)
         cc_file = join(self.path_cc + '/' + target,cc)
         cmd = "cp -p " + str(iri_file) + " " + str(cc_file) + " " + str(lea_dir)
@@ -269,7 +271,7 @@ class Evidences():
         if(stderr):
             self.log.error("Evidences::abnt: error: " + str(stderr))
             return False
-        
+
         return True
 
 
@@ -298,9 +300,17 @@ class Evidences():
                 self.email.send(email,subject,content)
                 self.change_state(lea,urls['cpf'],cdr_targets_id)
 
+            self.log.info("Evidences::alert_lea: Trying remove files") 
             iri_file = join(self.path_iri + '/' + urls['cpf'], iri)
             cc_file = join(self.path_cc + '/' + urls['cpf'],cc)
             cmd = "rm " + str(iri_file) + " " + str(cc_file)
+            process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            (stdout, stderr) = process.communicate()
+            if(stderr):
+                self.log.error("Evidences::alert_lea: error: " + str(stderr))
+            
+            self.log.info("Evidences::alert_lea: Trying chmod dir: " + str(self.path)) 
+            cmd = "chmod 755 -R " + str(self.path)
             process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             (stdout, stderr) = process.communicate()
             if(stderr):

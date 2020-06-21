@@ -10,7 +10,7 @@ import time
 
 class Mf(Ami):
     
-    def __init__(self, server:str, user:str, password:str, iri:dict, cc:dict, email:dict, host_evidences:str, sleep_time, db_name:str, mode:str, log):
+    def __init__(self, server:str, user:str, password:str, iri:dict, cc:dict, email:dict, host_evidences:str, sleep_time, db_name:str, mode:str, path_mf:str, log):
         super().__init__(server,user,password,log)
         self.log = log
         self.cdrs = Queue()
@@ -25,12 +25,13 @@ class Mf(Ami):
         self.email = email
         self.host_evidences = host_evidences
         self.mode = mode
+        self.path_mf = path_mf
 
     def setup(self):
         super().setup()
         super().register_event('Cdr',self.get_cdr)
         database = Database(self.db_name, self.log)
-        self.evidences = Evidences(self.iri,self.cc,self.email,self.host_evidences, self.log,database, self.mode)
+        self.evidences = Evidences(self.iri,self.cc,self.email,self.host_evidences, self.log,database, self.mode, self.path_mf)
 
     def get_cdr(self, manager, event):
         self.log.info("Mf::get_evidences: Event: " + str(event))
