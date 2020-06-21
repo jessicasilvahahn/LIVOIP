@@ -165,7 +165,7 @@ class Evidences():
                 
             if(targets):
                 for cpf,id in targets:
-                    if(not cpf in self.alerted_targets):
+                    if(not id in self.alerted_targets):
                         
                         self.alerted_targets.append(id)
                         self.log.info("Evidences::get_targets: alerted_targets: " + str(self.alerted_targets))
