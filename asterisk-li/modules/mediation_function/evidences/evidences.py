@@ -259,15 +259,6 @@ class Evidences():
                 if(stderr):
                     self.log.error("Evidences::abnt: error to update password: " + str(stderr))
                     return False
-                
-                #chown lea dir
-                self.log.debug("Evidences::abnt: Trying chown lea dir")
-                cmd = "chown root:root " + str(lea_dir)
-                process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                (stdout, stderr) = process.communicate()
-                if(stderr):
-                    self.log.error("Evidences::abnt: error: " + str(stderr))
-                    return False
 
         #mover arquivos para o diretorio
         iri_file = join(self.path_iri + '/' + target, iri)

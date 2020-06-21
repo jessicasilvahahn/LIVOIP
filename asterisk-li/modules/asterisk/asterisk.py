@@ -64,6 +64,8 @@ class Asterisk(Database):
                     self.client_cc.connect()
                     self.client_cc.send_message(interceptions)
                     self.client_cc.send_message("ACK")
+                    self.client_iri.close()
+                    self.client_cc.close()
             
                 self.log.info("Asterisk::get_interceptions: Sleeping ...")
                 time.sleep(self.sleep_time)
