@@ -30,6 +30,7 @@ class System():
             self.parameters['sleep'],
             self.parameters['db_name'],
             self.parameters['mode'],
+            self.parameters['path'],
             self.log)
 
         self.mf.setup()
@@ -94,7 +95,8 @@ class System():
                         'cc': cc,
                         'email': email,
                         'ami': ami,
-                        'mode': self.config.get('general','mode')}
+                        'mode': self.config.get('general','mode'),
+                        'path': self.config.get('general','path')}
 
 
         self.log_handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=self.config.getint('log', 'size'),
