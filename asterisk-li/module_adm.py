@@ -22,7 +22,7 @@ class System():
         self.server = None
 
     def run(self):
-        self.server = Server(self.parameters['address'],int(self.parameters['port']),self.parameters['database'],self.parameters['path'],self.parameters['host_asterisk'],self.parameters['port_asterisk'],self.parameters['user_asterisk'],self.parameters['password_asterisk'],self.parameters['timeout'],self.log)
+        self.server = Server(self.parameters['address'],int(self.parameters['port']),self.parameters['database'],self.parameters['host_asterisk'],self.parameters['port_asterisk'],self.parameters['user_asterisk'],self.parameters['password_asterisk'],self.parameters['timeout'],self.log)
         self.server.run() 
 
     def start(self, preserved_file = None):
@@ -57,15 +57,11 @@ class System():
         self.parameters = {'address': self.config.get('general','address'),
                             'port': self.config.get('general','port'),
                             'database': self.config.get('general','database'),
-                            'path': self.config.get('general','path'),
                             'host_asterisk': self.config.get('asterisk','host'),
                             'port_asterisk': self.config.getint('asterisk','port'),
                             'user_asterisk': self.config.get('asterisk','user'),
                             'password_asterisk': self.config.get('asterisk','password'),
-                            'timeout': self.config.getint('asterisk','timeout'),
-                            'host_sftp': self.config.get('sftp','host'),
-                            'user_sftp': self.config.get('sftp','user'),
-                            'password_sftp': self.config.get('sftp','password')}
+                            'timeout': self.config.getint('asterisk','timeout')}
                             
         self.log_handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=self.config.getint('log', 'size'),
                                                        backupCount=self.config.getint('log', 'backups'))

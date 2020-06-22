@@ -11,18 +11,8 @@ import base64
 import cgi
 import os
 
-class UriEvidences():
-    def __init__(self):
-        self.path = None
-
-    def set(self,path):
-        self.path = path
-
-
 database = Database()
-uri_evidences = UriEvidences()
 adm = Adm()
-
 
 class Handler(BaseHTTPRequestHandler):
 
@@ -92,24 +82,8 @@ class Handler(BaseHTTPRequestHandler):
 
         self.wfile.write(form.encode('utf-8'))
 
-    def login_get(self,target,file):
-        self.HEADER(MimeType.HTML)
-        form = '''<html><form action="" method="GET">
-            User Name :
-            <input type="text" name="username" id="username" placeholder="Enter User Name"> <br>
-            Password  :
-            <input type="password" name="password" id="password" placeholder="Enter Password"> <br>
-            Target:
-            <input type="text" name="target" id="target" value="''' + str(target) + '''"> <br>
-            File:
-            <input type="text" name="file" id="file" value="''' + str(file) + '''"> <br>
 
-            <button type="submit" id="submit">Sign in</button>
-        </form></html>'''
-
-        self.wfile.write(form.encode('utf-8'))
-    
-    def login_post(self):
+    def login(self):
         self.HEADER(MimeType.HTML)
         form = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "https://www.w3.org/TR/html4/strict.dtd">
@@ -167,48 +141,12 @@ class Handler(BaseHTTPRequestHandler):
                     elif(lea_user and lea_password and lea_email and cpf and date):
                         adm.add_interception(lea_user, lea_password, lea_email, cpf, date)
             else:
-                self.login_post()
+                self.login()
         except Exception as error:
             self.log.warning("Server::do_GET: Alert: " + str(error))
             self.user = None
             self.password = None
-            self.login_post()
-
-    def do_GET(self):
-        self.user = None
-        self.password = None
-        cpf = None
-        file = None
-        query_string = parse.urlparse(self.path).query
-        fields = parse.parse_qs(query_string)
-        self.log.info("Server::do_GET: fields: " + str(fields))
-        try:
-            cpf = fields.get('target')[0]
-            file = fields.get('file')[0]
-            self.user = fields.get('username')[0]
-            self.password = fields.get('password')[0]
-            if(self.user and self.password):
-                auth = self.auth()
-                if(not auth):
-                    self.log.debug("Server::do_GET: Not authorized! , user: " + str(user) + " and password: " + str(passowrd))
-                    self.send_response(200)
-                    self.end_headers()
-                    self.wfile.write('Not authorized!'.encode('utf-8'))
-                    return
-
-                path = join(uri_evidences.path + '/' + str(cpf), file)
-                self.log.debug("Server::do_GET: mode: " + str(uri_evidences.mode)
-                
-                mime_type = MimeType.TEXT
-                is_pcap = file.split(".")
-                if(is_pcap[0] == "wav"):
-                    mime_type = MimeType.AUDIO
-                self.get_file(path,mime_type,file)
-            else:
-                self.login_get(cpf,file)
-        except Exception as error:
-            self.log.warning("Server::do_GET: Alert: " + str(error))
-            self.login_get(cpf,file)
+            self.login()
 
     def auth(self):
         auth = False
@@ -221,34 +159,11 @@ class Handler(BaseHTTPRequestHandler):
             auth = True
         
         return auth
-    
-    def setup_sftp(self):
-        self.log.debug("Server::setup_sftp")
-        transport = None
-        try:
-            transport = paramiko.Transport((uri_evidences.host_sftp,uri_evidences.user_sftp))
-            transport.connect(None,uri_evidences.user_sftp,uri_evidences.password_sftp)
-        except Exception as error:
-            self.log.error("Server::do_GET: Alert: " + str(error))
-        
-        return transport
-        
-    def get_file(self,path,mime_type,file):
-        self.log.debug("Server::get_file: Trying get file: " + str(path))
-        if(exists(path)):
-            self.HEADER(mime_type,file)
-            with open(path, 'rb') as reader:
-                bytes_line = reader.read()
-                while(bytes_line):
-                    self.wfile.write(bytes_line)
-                    bytes_line = reader.read()
-        return
 
 class Server(Server):
-    def __init__(self, address, port, db_name, path, host_asterisk, port_asterisk, user_asterisk, password_asterisk, timeout, log):
+    def __init__(self, address, port, db_name, host_asterisk, port_asterisk, user_asterisk, password_asterisk, timeout, log):
         self.log = log
         adm.set_attributes(host_asterisk, port_asterisk, user_asterisk, password_asterisk, timeout, db_name, log)
-        uri_evidences.set(path)
         database.set_attributes(db_name,log)
         super().__init__(address,port,Handler,log)
 
