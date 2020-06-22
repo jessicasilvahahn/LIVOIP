@@ -36,7 +36,7 @@ class Handler(BaseHTTPRequestHandler):
         form = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "https://www.w3.org/TR/html4/strict.dtd">
         <html>
-            <form action="" method="post">
+            <form action="" method="get">
                 <fieldset>
                 <legend>Remove Lawful Interception</legend>
                 <label>Id da interceptação</label><br>
@@ -55,7 +55,7 @@ class Handler(BaseHTTPRequestHandler):
         form = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
             "https://www.w3.org/TR/html4/strict.dtd">
             <html>
-                <form action="" method="post">
+                <form action="" method="get">
                     <fieldset>
                     <legend>Register Lawful Interception</legend>
                     <label>Usuário</label><br>
@@ -88,7 +88,7 @@ class Handler(BaseHTTPRequestHandler):
         form = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "https://www.w3.org/TR/html4/strict.dtd">
         <html>
-            <form action="" method="post">
+            <form action="" method="get">
                 <fieldset>
                 <legend>Login</legend>
                 <label>Usuário</label><br>
@@ -103,12 +103,12 @@ class Handler(BaseHTTPRequestHandler):
 
         self.wfile.write(form.encode('utf-8'))
 
-    def do_POST(self):
+    def do_GET(self):
         try:
             form = cgi.FieldStorage(
                 fp=self.rfile,
                 headers=self.headers,
-                environ={'REQUEST_METHOD': 'POST'}
+                environ={'REQUEST_METHOD': 'GET'}
             )
             id = None
             lea_user = None
@@ -118,24 +118,24 @@ class Handler(BaseHTTPRequestHandler):
             date = None
             self.user = form.getvalue("usuario")
             self.password = form.getvalue("senha")
-            self.log.debug("Server::do_POST: user: " + str(self.user) + " password: " + str(self.password))
+            self.log.debug("Server::do_GET: user: " + str(self.user) + " password: " + str(self.password))
             if(self.user and self.password):
                 auth = self.auth()
                 if(not auth):
-                    self.log.debug("Server::do_POST: Not authorized! , user: " + str(user) + " and password: " + str(passowrd))
+                    self.log.debug("Server::do_GET: Not authorized! , user: " + str(user) + " and password: " + str(passowrd))
                     self.send_response(200)
                     self.end_headers()
                     self.wfile.write('Not authorized!'.encode('utf-8'))
                     return
 
                 parsed_path = (parse.urlparse(self.path)).path
-                self.log.debug("Server::do_POST: " + str(parsed_path))
+                self.log.debug("Server::do_GET: " + str(parsed_path))
                 if(parsed_path == '/register'):
                     self.register_li()
                 elif(parsed_path == '/unregister'):
                     self.unregister_li()
                 else:
-                    self.log.debug("Server::do_POST: atributtes: " + str(id) + ", " + str(lea_user) + ", " + str(lea_password) + ", " + str(lea_password) + ", " + str(cpf) + ", " + str(date))
+                    self.log.debug("Server::do_GET: atributtes: " + str(id) + ", " + str(lea_user) + ", " + str(lea_password) + ", " + str(lea_password) + ", " + str(cpf) + ", " + str(date))
                     if(id):
                         adm.inactivate_interception(int(id))
                     elif(lea_user and lea_password and lea_email and cpf and date):
