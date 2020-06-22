@@ -56,8 +56,22 @@ class Adm(Database):
         except Exception as error:
             self.log.error("Adm::inactivate_interception: error: " + str(error))
     
+    def get_uri(self, cpf:str):
+        uri = None
+        self.log.info("Adm::get_uri")
+        query = "SELECT uri from target where cpf=\'" + cpf + "\'"
+        (cursor,conn) = self.execute_query(query)
+        uri = (cursor.fetchone())[0]
+        self.log.info("Adm::get_uri: uri: " + str(uri))
+        self.disconnect()
+        return uri
+
     def target(self, cpf:str, uri:str):
         self.log.info("Adm::target")
+        uri = self.get_uri(cpf)
+        if(uri):
+            self.log.info("Adm::target: cpf is already registered with uri: " + str(uri))
+            return
         query = "INSERT INTO target VALUES(?,?)"
         values = [cpf,uri]
         self.connect()
