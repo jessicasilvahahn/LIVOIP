@@ -8,7 +8,7 @@ import sys
 import signal
 import daemon
 from daemon.pidfile import PIDLockFile
-from modules.adm_function.server.server import Server
+from modules.adm_function.adm_function import Adm
 
 class System():
     
@@ -17,12 +17,25 @@ class System():
         self.service_args = None
         self.log_handler = None
         self.stop = False
+        self.mode = None
         self.parameters = {}
-        self.server = None
 
     def run(self):
-        self.server = Server(self.parameters['address'],int(self.parameters['port']),self.parameters['database'],self.parameters['host_asterisk'],self.parameters['port_asterisk'],self.parameters['user_asterisk'],self.parameters['password_asterisk'],self.parameters['timeout'],self.log)
-        self.server.run() 
+        stop = False
+        adm = Adm(self.parameters['host'],self.parameters['port'],self.parameters['user'],self.parameters['password'],self.parameters['timeout'],self.parameters['database'],self.log)
+        while(not stop):
+            if(self.mode == 'add'):
+                adm.add_interception()
+            elif(self.mode == 'rm'):
+                adm.inactivate_interception()
+
+            stop = input("Continuar cadastro (y or n) \n")
+            if(stop == 'y'):
+                stop = False
+            elif(stop == 'n'):
+                stop = True
+            else:
+                stop = input("Digite a opcao correta: Continuar cadastro (y or n) \n")    
 
     def start(self, preserved_file = None):
         if self.service_args.daemon:
@@ -30,6 +43,10 @@ class System():
                 self.run()
         else:
             self.run()
+
+    def stop(self):
+        if(self.ali):
+            self.ali.stop()
 
     def setup(self):
         parser = argparse.ArgumentParser(description='Allowed options')
@@ -50,17 +67,16 @@ class System():
             'error': logging.ERROR,
             'critical': logging.CRITICAL}
 
+        self.mode = self.config.get('mode','type')
         log_name = self.config.get('log', 'name')
 
-        self.parameters = {'address': self.config.get('general','address'),
+        self.parameters = {'host': self.config.get('general','host'),
                             'port': self.config.get('general','port'),
-                            'database': self.config.get('general','database'),
-                            'host_asterisk': self.config.get('asterisk','host'),
-                            'port_asterisk': self.config.getint('asterisk','port'),
-                            'user_asterisk': self.config.get('asterisk','user'),
-                            'password_asterisk': self.config.get('asterisk','password'),
-                            'timeout': self.config.getint('asterisk','timeout')}
-                            
+                            'user': self.config.get('general','user'),
+                            'password': self.config.get('general','password'),
+                            'timeout': self.config.getint('general','timeout'),
+                            'database': self.config.get('general','database')}
+        
         self.log_handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=self.config.getint('log', 'size'),
                                                        backupCount=self.config.getint('log', 'backups'))
         formatter = logging.Formatter('%(asctime)s %(levelname)s %(name)s: '\
