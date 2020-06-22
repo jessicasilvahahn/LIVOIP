@@ -17,7 +17,6 @@ class System():
         self.service_args = None
         self.log_handler = None
         self.stop = False
-        self.mode = None
         self.parameters = {}
         self.server = None
 
@@ -51,7 +50,6 @@ class System():
             'error': logging.ERROR,
             'critical': logging.CRITICAL}
 
-        self.mode = self.config.get('general','mode')
         log_name = self.config.get('log', 'name')
 
         self.parameters = {'address': self.config.get('general','address'),
