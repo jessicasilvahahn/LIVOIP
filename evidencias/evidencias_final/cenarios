@@ -11,7 +11,7 @@ cpf: 92798173027, uri: 48988163769
 cpf: 08974676983, uri: 48988320035
 cpf: 79799452040, uri: 48991323494
 
-
+*******Rede de Casa*********
 Cenário 1:
 
 Alvo já cadastrado manualmente: 48988320035 e rede de casa
@@ -21,9 +21,7 @@ Alvo já cadastrado manualmente: 48988320035 e rede de casa
 2 - Número 48988163769 faz uma ligação para o alvo 48988320035
 
 
-Cenário 2 (vídeo):
-
-Alvos cadastrados pela interface com rede do ifsc (VPN)
+Cenário 2 (vídeo - Kazam):
 
 Cadastro: Interceptação com o alvo 48988163769
 
@@ -33,11 +31,15 @@ Cadastro: Interceptação com o alvo 48988163769
 
 Cenário 3:
 
+Cadastro: Interceptação com o alvo 48988163769
+
+1 - Alvo: 48988163769 faz uma ligação para 48988320035
+
 Adiciona nova interceptação com novo alvo: 48991323494
 
 Remove interceptacao associada ao alvo 48988163769
 
-1 - Número 48988320035 faz uma ligação para 48988163769 (que foi removido anteriormente)
+2 - Número 48988320035 faz uma ligação para 48988163769 (que foi removido anteriormente)
 
 
 Cenário 4: 
@@ -46,4 +48,20 @@ Recadastro: Interceptação com o alvo 48988163769
 
 1 - Alvo: 48988163769 faz uma ligação para 48988320035
 2 - Alvo: 48991323494 faz uma ligação para outro alvo 48988163769
+
+
+*******Rede do IFSC (VPN)*******
+
+Ver com o boi pq VPN parou de funcionar
+
+
+Cenário 6 :
+
+Alvos cadastrados pela interface com rede do ifsc (VPN)
+
+Cadastro: Interceptação com o alvo 48988163769
+
+1 - Alvo: 48988163769 faz uma ligação para 48988320035
+
+2 - Número 48988320035 faz uma ligação para o alvo 48988163769
 

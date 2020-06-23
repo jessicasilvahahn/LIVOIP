@@ -61,7 +61,8 @@ class Adm(Database):
         self.log.info("Adm::get_uri")
         query = "SELECT uri from target where cpf=\'" + cpf + "\'"
         (cursor,conn) = self.execute_query(query)
-        uri = (cursor.fetchone())[0]
+        if(cursor):
+            uri = (cursor.fetchone())[0]
         self.log.info("Adm::get_uri: uri: " + str(uri))
         self.disconnect()
         return uri
