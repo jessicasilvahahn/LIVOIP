@@ -12,18 +12,18 @@ cpf: 08974676983, uri: 48988320035
 cpf: 79799452040, uri: 48991323494
 
 
-Alvos já cadastrados manualmente
+Cenário 1:
 
-Cenário 1 (vídeo):
+Alvo já cadastrado manualmente: 48988320035 e rede de casa
 
 1 - Alvo: 48988320035 faz uma ligação para 48988163769
 
 2 - Número 48988163769 faz uma ligação para o alvo 48988320035
 
 
-Alvos cadastrados pela interface
-
 Cenário 2 (vídeo):
+
+Alvos cadastrados pela interface com rede do ifsc (VPN)
 
 Cadastro: Interceptação com o alvo 48988163769
 
