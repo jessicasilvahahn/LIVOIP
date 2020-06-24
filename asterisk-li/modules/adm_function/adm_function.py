@@ -71,13 +71,14 @@ class Adm(Database):
         return uri
 
     def target(self, cpf:str, uri:str):
+        new_uri = uri
         self.log.info("Adm::target")
         uri = self.get_uri(cpf)
         if(uri):
             self.log.info("Adm::target: cpf is already registered with uri: " + str(uri))
             return
         query = "INSERT INTO target VALUES(?,?)"
-        values = [cpf,uri]
+        values = [cpf,new_uri]
         self.connect()
         (cursor,conn) = self.execute_query(query, values)
         conn.commit()
