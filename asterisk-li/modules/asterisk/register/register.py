@@ -16,11 +16,11 @@ class Register(Database):
         self.log.info("Register::search_uri: target: " + cpf)
         try:
             query = "SELECT uri from uri where cpf=\'" + cpf + '\''
-            self.connect()
             (cursor,conn) = self.execute_query(query)
             if(cursor):
                 uri = cursor.fetchone()
-                uri = uri[0]
+                if(uri):
+                    uri = uri[0]
         except Exception as error:
             self.log.error("Register::search_uri: error: " + str(error))
         
@@ -32,11 +32,11 @@ class Register(Database):
         self.log.info("Register::search_target: uri: " + uri)
         try:
             query = "SELECT id from target where target=\'" + uri + '\''
-            self.connect()
             (cursor,conn) = self.execute_query(query)
             if(cursor):
                 id = cursor.fetchone()
-            id = id[0]
+                if(id):
+                    id = id[0]
         except Exception as error:
             self.log.error("Register::search_uri: error: " + str(error))
         
