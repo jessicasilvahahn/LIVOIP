@@ -53,7 +53,7 @@ class Evidences():
             makedirs(path_dir)
         return path_dir
     
-    def get_iri(self, name:str, new_path:str):
+    def get_iri(self, name:str, new_path:str, name_abnt:str):
         state = False
         self.log.info("Evidences::get_iri: file: " + str(name))
         host = self.iri_client.server_parameters['host'] + ':' + self.iri_client.server_parameters['port']
@@ -76,7 +76,7 @@ class Evidences():
             pcap_b = new_path
             state = self.get_iri_proxy(proxy,new_path)
             if(state):
-                state = self.join_pcap(pcap_a, pcap_b, path_new_pcap, name_new_pcap)
+                state = self.join_pcap(pcap_a, pcap_b, path_new_pcap, name_abnt)
         
         self.log.info("Evidences::get_iri: state: " + str(state))
         return state
@@ -156,7 +156,7 @@ class Evidences():
             id = None
             targets = None
 
-            query = "SELECT target_id,id from cdr_targets where alert=0;"
+            query = "SELECT target_id,id,cdr_id from cdr_targets where alert=0;"
             self.database.connect()
             (cursor,conn) = self.database.execute_query(query)
             if(cursor):
@@ -164,7 +164,7 @@ class Evidences():
                 self.log.info("Evidences::get_targets: targets: " + str(targets))
                 
             if(targets):
-                for cpf,id in targets:
+                for cpf,id,cdr_id in targets:
                     if(not id in self.alerted_targets):
                         
                         self.alerted_targets.append(id)
@@ -189,7 +189,7 @@ class Evidences():
                             self.log.info("Evidences::get_targets: evidences: " + str(evidences))
                             if(evidences):
                                 for iri,cc in evidences:
-                                    targets_dict = {cpf: {'cdr_targets_id': id, 'lea': leas_list, 'iri': iri, 'cc': cc}}
+                                    targets_dict = {cpf: {'cdr_targets_id': id, 'lea': leas_list, 'iri': iri, 'cc': cc, 'cdr_id':cdr_id}}
                                     self.log.info("Evidences::get_targets: targets: " + str(targets))
                                     self.targets.put(targets_dict)
 
@@ -197,10 +197,43 @@ class Evidences():
             self.log.info("Evidences::get_targets: Sleeping ... ")
             time.sleep(4)
 
+    def new_name_abnt(self, cpf:str, cdr_id:int):
+        self.log.info("Evidences::new_name_abnt with cpf: " + cpf)
+        uri = None
+        end_time = None
+        name = None
+        query = "SELECT uri from target where cpf=\'" + cpf + "\'"
+        (cursor,conn) = self.database.execute_query(query)
+        if(cursor):
+            uri = cursor.fetchone()
+            if(uri):
+                uri = uri[0]
+
+        self.log.info("Evidences::new_name_abnt uri: " + str(uri))
+        query = "SELECT end_call_time from cdr where id=" + str(id)
+        (cursor,conn) = self.database.execute_query(query)
+        if(cursor):
+            end_time = cursor.fetchone()
+            if(end_time):
+                end_time = end_time[0]
+        self.log.info("Evidences::new_name_abnt end_time: " + str(end_time))
+        end_time = end_time.split(" ")
+        date = end_time[0]
+        time = end_time[1]
+        self.log.info("Evidences::new_name_abnt date: " + str(date) + " time: " + str(time))
+        date = date.split("-")
+        time = time.split(":")
+        name = uri + "-" + date[0] + date[1] + date[2] + time[0] + time[1] + time[2]
+        self.log.info("Evidences::new_name_abnt new name: " + str(name))
+        return name
+
     def get_evidences(self):
         while(True):
             new_path_iri = None
             new_path_cc = None
+            name_abnt_cc = None
+            name_abnt_iri = None
+            name_abnt = None
             urls = None
             url_iri = "http://" + self.host + '/iri'
             url_cc = "http://" + self.host + '/cc'
@@ -208,13 +241,17 @@ class Evidences():
             if(not self.targets.empty()):
                 targets = self.targets.get()
                 for targets in targets.items():
-                    iri = (targets[1])['iri']
-                    cc = (targets[1])['cc']
+                    cdr_id = (targets[1])['cdr_id']
                     new_path_iri = self.create_dir(self.path_iri,targets[0])
                     new_path_cc = self.create_dir(self.path_cc,targets[0])
-                    new_path_cc = join(new_path_cc,cc)
+                    name_abnt = self.new_name_abnt(targets[0],cdr_id)
+                    name_abnt_cc = name_abnt + "-" + "rtp.pcap"
+                    cc = name_abnt_cc
+                    new_path_cc = join(new_path_cc,name_abnt_cc)
                     state_iri = self.get_cc(cc,new_path_cc)
-                    state_cc = self.get_iri(iri,new_path_iri)
+                    name_abnt_iri = name_abnt + "-" + "sip.pcap"
+                    iri = name_abnt_iri
+                    state_cc = self.get_iri(iri,new_path_iri,name_abnt_iri)
                     self.log.debug("Evidences::get_evidences: states: " + str(state_iri) + ' ' + str(state_cc))
                     if(state_iri and state_cc):
                         self.log.debug("Evidences::get_evidences: evidences (iri and cc) founded!")
