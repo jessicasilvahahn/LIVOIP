@@ -1,0 +1,33 @@
+2020-06-23 23:09:20,310 INFO /opt/li-asterisk/logs/adm.log: Adm::add_interception
+2020-06-23 23:13:37,828 INFO /opt/li-asterisk/logs/adm.log: Adm::add_interception
+2020-06-23 23:13:45,199 INFO /opt/li-asterisk/logs/adm.log: Adm::add_interception
+2020-06-23 23:14:18,494 INFO /opt/li-asterisk/logs/adm.log: Adm::add_interception: Url: http://35.247.254.184:8081/ari/interception/add/?target=92798173027
+2020-06-23 23:14:18,516 INFO /opt/li-asterisk/logs/adm.log: Adm::add_interception: code: 200 json: {'id': 1, 'uri': '48988163769'}
+2020-06-23 23:14:18,516 INFO /opt/li-asterisk/logs/adm.log: Adm::add_interception: interception_id: 1 uri: 48988163769
+2020-06-23 23:14:18,516 INFO /opt/li-asterisk/logs/adm.log: Adm::target
+2020-06-23 23:14:18,516 INFO /opt/li-asterisk/logs/adm.log: Adm::get_uri
+2020-06-23 23:14:18,516 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,517 INFO /opt/li-asterisk/logs/adm.log: Database::execute_query: Trying execute query: SELECT uri from target where cpf='92798173027'
+2020-06-23 23:14:18,517 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,517 INFO /opt/li-asterisk/logs/adm.log: Adm::get_uri: uri: None
+2020-06-23 23:14:18,517 INFO /opt/li-asterisk/logs/adm.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,517 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,517 INFO /opt/li-asterisk/logs/adm.log: Database::execute_query: Trying execute query: INSERT INTO target VALUES(?,?)
+2020-06-23 23:14:18,518 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,523 INFO /opt/li-asterisk/logs/adm.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,524 INFO /opt/li-asterisk/logs/adm.log: Adm::lea
+2020-06-23 23:14:18,524 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,524 INFO /opt/li-asterisk/logs/adm.log: Database::execute_query: Trying execute query: INSERT INTO lea VALUES(?,?,?,?)
+2020-06-23 23:14:18,524 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,529 INFO /opt/li-asterisk/logs/adm.log: Database::execute_query: Trying execute query: SELECT MAX(id) from lea
+2020-06-23 23:14:18,529 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,529 INFO /opt/li-asterisk/logs/adm.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,529 INFO /opt/li-asterisk/logs/adm.log: Adm::oficio
+2020-06-23 23:14:18,530 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,530 INFO /opt/li-asterisk/logs/adm.log: Database::execute_query: Trying execute query: INSERT INTO oficio VALUES(?,?,?)
+2020-06-23 23:14:18,530 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,535 INFO /opt/li-asterisk/logs/adm.log: Database::execute_query: Trying execute query: SELECT MAX(id) from oficio
+2020-06-23 23:14:18,535 INFO /opt/li-asterisk/logs/adm.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,535 INFO /opt/li-asterisk/logs/adm.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/mediation_function/conf/vazio/mediation_function.db
+2020-06-23 23:14:18,536 INFO /opt/li-asterisk/logs/adm.log: Adm::li
+2020-06-23 23:14:18,536 INFO /opt/li-asterisk/logs/adm.log: Adm::li: query: INSERT INTO li VALUES(?,?,?,?)

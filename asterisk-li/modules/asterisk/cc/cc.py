@@ -1,7 +1,7 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from library.events.events import Events
 from library.socket.tcp import Server
-from library.shared.database.database import Database
+from library.database.database import Database
 import threading
 from queue import Queue
 import time

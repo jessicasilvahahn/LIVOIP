@@ -5,7 +5,7 @@ from os import rename
 from os.path import join
 from library.events.asterisk import Record
 from library.events.asterisk import Status
-from library.shared.ami.ami import Ami
+from library.ami.ami import Ami
 from queue import Queue
 
 

@@ -24,7 +24,13 @@ INSERT INTO interception (id,target,flag)
 VALUES(1,1,'A');
 
 INSERT INTO uri (id,uri,cpf)
-VALUES(NULL,'bob','08974676983');
+VALUES(NULL,'48988163769','92798173027');
+
+INSERT INTO uri (id,uri,cpf)
+VALUES(NULL,'48988320035','08974676983');
+
+INSERT INTO uri (id,uri,cpf)
+VALUES(NULL,'48991323494','79799452040');
 
 INSERT INTO uri (id,uri,cpf)
 VALUES(NULL,'jessica','08974676982');

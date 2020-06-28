@@ -1,6 +1,6 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
-from library.shared.database.database import Database
-from library.shared.interception.status import Status
+from library.database.database import Database
+from library.interception.status import Status
 
 class Register(Database):
 
@@ -11,36 +11,57 @@ class Register(Database):
         super().__init__(db_name,log)
         self.log = log
 
-    def search_target(self, cpf:str):
+    def search_uri(self, cpf:str):
         uri = None
-        self.log.info("Register::search_target: target: " + cpf)
+        self.log.info("Register::search_uri: target: " + cpf)
         try:
             query = "SELECT uri from uri where cpf=\'" + cpf + '\''
-            self.connect()
             (cursor,conn) = self.execute_query(query)
-            uri = cursor.fetchone()
-            uri = uri[0]
+            if(cursor):
+                uri = cursor.fetchone()
+                if(uri):
+                    uri = uri[0]
         except Exception as error:
-            self.log.error("Register::search_target: error: " + str(error))
+            self.log.error("Register::search_uri: error: " + str(error))
         
         self.disconnect()
         return uri
 
+    def search_target(self, uri:str):
+        id = None
+        self.log.info("Register::search_target: uri: " + uri)
+        try:
+            query = "SELECT id from target where target=\'" + uri + '\''
+            (cursor,conn) = self.execute_query(query)
+            if(cursor):
+                id = cursor.fetchone()
+                if(id):
+                    id = id[0]
+        except Exception as error:
+            self.log.error("Register::search_uri: error: " + str(error))
+        
+        self.disconnect()
+        return id
+
     def add_interception(self, cpf:str):
         self.log.info("Register::add_interception: target: " + cpf)
-        uri = self.search_target(cpf)
+        target_id = None
+        uri = self.search_uri(cpf)
         id_interception = None
         if(uri):
             flag = Status.ATIVO.value
-            query = "INSERT INTO target VALUES(?,?)"
-            values = [None,uri]
-            self.connect()
-            (cursor,conn) = self.execute_query(query,values)
-            conn.commit()
-            query = "SELECT MAX(id) from target;"
-            (cursor,conn) = self.execute_query(query)
-            target_id = cursor.fetchone()
-            target_id = target_id[0]
+            target_id = self.search_target(uri)
+            if(not target_id):
+                query = "INSERT INTO target VALUES(?,?)"
+                values = [None,uri]
+                self.connect()
+                (cursor,conn) = self.execute_query(query,values)
+                conn.commit()
+                query = "SELECT MAX(id) from target;"
+                (cursor,conn) = self.execute_query(query)
+                target_id = cursor.fetchone()
+                target_id = target_id[0]
+            
             query = "INSERT INTO interception VALUES(?,?,?)"
             values = [None,target_id,flag]
             (cursor,conn) = self.execute_query(query,values)

@@ -1,9 +1,9 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from modules.adm_function.user_interface.simple.interface import Interface
-from library.shared.database.database import Database
-from library.shared.ari.http import Http
-from library.shared.ari.http import Method
-from library.shared.ari import uris
+from library.database.database import Database
+from library.ari.http import Http
+from library.ari.http import Method
+from library.ari import uris
 import json
 from enum import Enum
 
@@ -56,10 +56,29 @@ class Adm(Database):
         except Exception as error:
             self.log.error("Adm::inactivate_interception: error: " + str(error))
     
+    def get_uri(self, cpf:str):
+        uri = None
+        self.log.info("Adm::get_uri")
+        self.connect()
+        query = "SELECT uri from target where cpf=\'" + cpf + "\'"
+        (cursor,conn) = self.execute_query(query)
+        if(cursor):
+            uri = cursor.fetchone()
+            if(uri):
+                uri = uri[0]
+        self.log.info("Adm::get_uri: uri: " + str(uri))
+        self.disconnect()
+        return uri
+
     def target(self, cpf:str, uri:str):
+        new_uri = uri
         self.log.info("Adm::target")
+        uri = self.get_uri(cpf)
+        if(uri):
+            self.log.info("Adm::target: cpf is already registered with uri: " + str(uri))
+            return
         query = "INSERT INTO target VALUES(?,?)"
-        values = [cpf,uri]
+        values = [cpf,new_uri]
         self.connect()
         (cursor,conn) = self.execute_query(query, values)
         conn.commit()

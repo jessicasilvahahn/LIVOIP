@@ -1,0 +1,58 @@
+2020-06-23 22:57:28,990 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/interception/add/
+2020-06-23 22:57:28,990 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: ADD_INTERCEPTION
+2020-06-23 22:57:28,990 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: ADD_INTERCEPTION, target, 92798173027
+2020-06-23 22:57:28,990 INFO /opt/li-asterisk/logs/server_asterisk.log: Register::add_interception: target: 92798173027
+2020-06-23 22:57:28,990 INFO /opt/li-asterisk/logs/server_asterisk.log: Register::search_uri: target: 92798173027
+2020-06-23 22:57:28,990 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: SELECT uri from uri where cpf='92798173027'
+2020-06-23 22:57:28,990 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:28,991 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:28,991 INFO /opt/li-asterisk/logs/server_asterisk.log: Register::search_target: uri: 48988163769
+2020-06-23 22:57:28,992 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: SELECT id from target where target='48988163769'
+2020-06-23 22:57:28,992 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:28,992 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:28,992 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:28,992 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: INSERT INTO target VALUES(?,?)
+2020-06-23 22:57:28,992 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:28,998 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: SELECT MAX(id) from target;
+2020-06-23 22:57:28,999 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:28,999 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: INSERT INTO interception VALUES(?,?,?)
+2020-06-23 22:57:28,999 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:29,004 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: SELECT MAX(id) from interception;
+2020-06-23 22:57:29,004 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:29,004 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 22:57:29,005 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: msg: {'id': 1, 'uri': '48988163769'}
+2020-06-23 23:14:18,501 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/interception/add/
+2020-06-23 23:14:18,501 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: ADD_INTERCEPTION
+2020-06-23 23:14:18,501 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: ADD_INTERCEPTION, target, 92798173027
+2020-06-23 23:14:18,501 INFO /opt/li-asterisk/logs/server_asterisk.log: Register::add_interception: target: 92798173027
+2020-06-23 23:14:18,501 INFO /opt/li-asterisk/logs/server_asterisk.log: Register::search_uri: target: 92798173027
+2020-06-23 23:14:18,501 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: SELECT uri from uri where cpf='92798173027'
+2020-06-23 23:14:18,502 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,502 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,502 INFO /opt/li-asterisk/logs/server_asterisk.log: Register::search_target: uri: 48988163769
+2020-06-23 23:14:18,502 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: SELECT id from target where target='48988163769'
+2020-06-23 23:14:18,502 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,503 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,503 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,503 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: INSERT INTO target VALUES(?,?)
+2020-06-23 23:14:18,503 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,508 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: SELECT MAX(id) from target;
+2020-06-23 23:14:18,508 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,509 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: INSERT INTO interception VALUES(?,?,?)
+2020-06-23 23:14:18,509 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,513 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::execute_query: Trying execute query: SELECT MAX(id) from interception;
+2020-06-23 23:14:18,513 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::connect: Trying connect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,514 INFO /opt/li-asterisk/logs/server_asterisk.log: Database::disconnect: Trying disconnect to database: /opt/li-asterisk/ali/asterisk-li/modules/asterisk/conf/vazio/asterisk.db
+2020-06-23 23:14:18,514 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: msg: {'id': 1, 'uri': '48988163769'}
+2020-06-23 23:20:15,580 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:20:15,587 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:20:21,612 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:20:21,619 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:20:24,642 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:20:24,649 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:30:29,835 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:30:29,842 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:30:32,863 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:30:32,869 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:30:35,890 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
+2020-06-23 23:30:35,897 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
