@@ -1,10 +1,9 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 
 class Cdr():
-    def __init__(self, iri, cc, answer_time, call_duration, end_call_time, call_start_time, source_uri, destination_uri, database,log):
+    def __init__(self,call_id,answer_time, call_duration, end_call_time, call_start_time, source_uri, destination_uri, database,log):
         self.log = log
-        self.iri = iri
-        self.cc = cc
+        self.call_id = call_id
         self.answer_time = answer_time
         self.call_duration = call_duration
         self.end_call_time = end_call_time
@@ -15,8 +14,8 @@ class Cdr():
 
     def cdr(self):
         self.log.info("Cdr::cdr: Trying insert values to cdr table")
-        query = '''INSERT INTO cdr VALUES(?,?,?,?,?,?,?,?,?)'''
-        values = [None,self.answer_time,self.call_duration,self.end_call_time,self.call_start_time,self.source_uri,self.destination_uri,self.iri,self.cc]
+        query = '''INSERT INTO cdr VALUES(?,?,?,?,?,?,?,?)'''
+        values = [None,self.answer_time,self.call_duration,self.end_call_time,self.call_start_time,self.source_uri,self.destination_uri,self.call_id]
         self.database.connect()
         (cursor,conn) = self.database.execute_query(query,values)
         conn.commit()

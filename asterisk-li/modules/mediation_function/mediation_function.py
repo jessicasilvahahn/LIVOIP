@@ -10,7 +10,7 @@ import time
 
 class Mf(Ami):
     
-    def __init__(self, server:str, user:str, password:str, iri:dict, cc:dict, email:dict, host_evidences:str, sleep_time, db_name:str, mode:str, path_mf:str, log):
+    def __init__(self, server:str, user:str, password:str, iri:dict, cc:dict, email:dict, host_evidences:str, sleep_time, db_name:str, path_mf:str, log):
         super().__init__(server,user,password,log)
         self.log = log
         self.cdrs = Queue()
@@ -24,14 +24,13 @@ class Mf(Ami):
         self.sleep = sleep_time
         self.email = email
         self.host_evidences = host_evidences
-        self.mode = mode
         self.path_mf = path_mf
 
     def setup(self):
         super().setup()
         super().register_event('Cdr',self.get_cdr)
         database = Database(self.db_name, self.log)
-        self.evidences = Evidences(self.iri,self.cc,self.email,self.host_evidences, self.log,database, self.mode, self.path_mf)
+        self.evidences = Evidences(self.iri,self.cc,self.email,self.host_evidences, self.log,database, self.path_mf)
 
     def get_cdr(self, manager, event):
         self.log.info("Mf::get_evidences: Event: " + str(event))
@@ -39,8 +38,7 @@ class Mf(Ami):
         if(disposition == 'ANSWERED'):
             self.log.info("Mf::get_evidences: ANSWERED ")
             call_id = event['AccountCode']
-            iri = call_id + '.pcap'
-            cc = call_id + '.wav'
+            call_id = call_id.strip(" ")
             answer_time = event['AnswerTime']
             call_duration = event['Duration']
             end_call_time = event['EndTime']
@@ -48,7 +46,7 @@ class Mf(Ami):
             source_uri = event['Source']
             destination_uri = event['Destination']
             database = Database(self.db_name, self.log)
-            cdr = Cdr(iri, cc, answer_time, call_duration, end_call_time, call_start_time, source_uri, destination_uri, database,self.log)
+            cdr = Cdr(call_id,answer_time, call_duration, end_call_time, call_start_time, source_uri, destination_uri, database,self.log)
             self.cdrs.put(cdr)
         return
     def save_cdr(self):

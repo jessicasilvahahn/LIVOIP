@@ -7,7 +7,10 @@ CREATE TABLE lea(
    id INTEGER PRIMARY KEY NOT NULL,
    user VARCHAR(50) NOT NULL,
    password VARCHAR(50) NOT NULL,
-   email VARCHAR(100) NOT NULL
+   email VARCHAR(100) NOT NULL,
+   ip VARCHAR(100),
+   port INTEGER,
+   path_sftp VARCHAR(100)
    );
 
 CREATE TABLE oficio(
@@ -34,8 +37,7 @@ CREATE TABLE cdr(
    call_start_time TEXT NOT NULL,
    source_uri VARCHAR(80) NOT NULL,
    destination_uri VARCHAR(80) NOT NULL,
-   iri VARCHAR(80) NOT NULL,
-   cc VARCHAR(80) NOT NULL
+   call_id VARCHAR(100) NOT NULL
    );
 
 

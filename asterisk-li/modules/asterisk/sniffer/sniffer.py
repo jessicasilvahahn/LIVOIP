@@ -4,6 +4,7 @@ import threading
 from library.sip.sip import Sip
 from library.sip.sip import Message
 from queue import Queue
+from  itertools import chain
 
 class Sniffer():
     def __init__(self, interface, protocol, port, log):
@@ -19,6 +20,17 @@ class Sniffer():
         self.__sip_dict = {}
         self.sip_state = {}
         self.sip = None
+    
+    def get_interception_id(self, uri):
+        self.log.info("Sniffer::get_interception_id: Trying get interception id from list: " + str(self.interception_list)  + " and uri: " + uri)
+        interceptions_id = []
+        for item in self.interception_list:
+            if(item[1] == uri):
+                interceptions_id.append(item[0])
+        
+        self.log.info("Sniffer::get_interception_id: interceptions id: " + str(interceptions_id))
+        return interceptions_id
+
 
     def complete(self):
         self.log.info("Sniffer::complete")
@@ -69,6 +81,7 @@ class Sniffer():
         self.log.info("Sniffer::callback")
         sip = {}
         proxy = None
+        interceptions_id = []
         try:
             load = packet.load
             packet_string = load.decode()
@@ -87,12 +100,18 @@ class Sniffer():
                     if(asterisk_call_id):
                         proxy = asterisk_call_id
                     
-                    if(uri_from in self.interception_list):
+                    if(uri_from in chain(*self.interception_list)):
                         self.log.info("Sniffer::callback: target " + str(uri_from))
-                        sip = {call_id: {'URI': uri_from, 'proxy': proxy, 'Call-ID': call_id, 'packets': [packet]}}
-                    elif(uri_to in self.interception_list):
+
+                        interceptions_id = self.get_interception_id(uri_from)
+
+                        sip = {call_id: {'URI': uri_from, 'proxy': proxy, 'Call-ID': call_id, 'packets': [packet], "interceptions_id": interceptions_id}}
+                    elif(uri_to in chain(*self.interception_list)):
                         self.log.info("Sniffer::callback: target " + str(uri_to))
-                        sip = {call_id: {'URI': uri_to, 'proxy': proxy, 'Call-ID': call_id, 'packets': [packet]}}
+
+                        interceptions_id = self.get_interception_id(uri_to)
+
+                        sip = {call_id: {'URI': uri_to, 'proxy': proxy, 'Call-ID': call_id, 'packets': [packet], "interceptions_id": interceptions_id}}
                         
                     self.__sip_dict.update(sip)
                     self.sip_state.update({call_id: {

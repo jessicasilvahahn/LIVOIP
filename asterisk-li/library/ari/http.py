@@ -24,7 +24,7 @@ class Http():
 
 		}
 
-	def http_request(self, http_method:Method, uri: str, is_stream, data = None):
+	def http_request(self, http_method:Method, uri, is_stream, headers, data = None):
 		code = None
 		response = None
 		json = None
@@ -33,13 +33,17 @@ class Http():
 			if(http_method == Method.GET):
 				if(self.server_parameters["user"] and self.server_parameters["password"]):
 					response = requests.get(uri, auth=(self.server_parameters["user"], 
-						self.server_parameters["password"]), timeout=self.timeout, stream=is_stream)
+						self.server_parameters["password"]), timeout=self.timeout, headers=headers, stream=is_stream)
 				else:
-					response = requests.get(uri, timeout=self.timeout, stream=is_stream)
+					response = requests.get(uri, timeout=self.timeout, headers=headers, stream=is_stream)
 
 			elif(http_method == Method.POST):
-				response = requests.post(uri, auth=(self.server_parameters["user"], 
-					self.server_parameters["password"]), timeout=self.timeout, data = data)
+				if(self.server_parameters["user"] and self.server_parameters["password"]):
+					response = requests.post(uri, auth=(self.server_parameters["user"], 
+						self.server_parameters["password"]), headers=headers, timeout=self.timeout, data=data, stream=is_stream, verify=False)
+
+				else:
+					response = requests.post(uri, headers=headers, timeout=self.timeout, data=data, stream=is_stream, verify=False)
 
 			elif(http_method == Method.DELETE):
 				response = requests.delete(uri, auth=(self.server_parameters["user"], 

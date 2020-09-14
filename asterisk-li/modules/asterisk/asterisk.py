@@ -2,7 +2,7 @@
 from library.database.database import Database
 from library.socket.tcp import Client
 import time
-from library.interception.status import Status
+from library.interception.interception import Status
 
 class Asterisk(Database):
     def __init__(self, db_name, sleep_time, log):
@@ -16,30 +16,37 @@ class Asterisk(Database):
         self.__iri_port = None
         self.__cc_host = None
         self.__cc_port = None
+        self.db_name = db_name
 
     def get_targets(self):
         self.log.info("Asterisk::get_targets: Trying get targets from database")
-        query = "SELECT target from interception where flag=\'" + str(Status.ATIVO.value) + "\'"
+        query = "SELECT id,target from interception where flag=\'" + str(Status.ATIVO.value) + "\'"
         interceptions = []
         self.connect()
         (cursor,conn) = self.execute_query(query)
-        targets_tuple = cursor.fetchall()
-        if(targets_tuple):
-            for target_tuple in targets_tuple:
-                for target in target_tuple:
-                    query = "SELECT target from target where id=" + str(target)
-                    (cursor,conn) = self.execute_query(query)
-                    targets_tuple = cursor.fetchall()
-                    for target_tuple in targets_tuple:
-                        for target in target_tuple:
-                            interceptions.append(target)
+        targets = cursor.fetchall()
+        if(targets):
+            for interception_id, target in targets:
+                query = "SELECT target from target where id=" + str(target)
+                (cursor,conn) = self.execute_query(query)
+                targets_tuple = cursor.fetchall()
+                for target_tuple in targets_tuple:
+                    for target in target_tuple:
+                        query = "SELECT uri from uri where id=" + str(target)
+                        (cursor,conn) = self.execute_query(query)
+                        uri = cursor.fetchone()
+                        self.log.debug("Asterisk::get_targets: uri: " + str(uri))
+                        uri = uri[0]
+                        self.log.debug("Asterisk::get_targets: uri and interception_id: " + str(interceptions_dict))
+                        interceptions.append((interception_id, uri))
         self.disconnect()
+        self.debug("Asterisk::get_targets: interceptions list: " + str(interceptions))
         return interceptions
 
     def setup(self):
         self.log.info("Asterisk::setup: Trying create iri client: host " + str(self.__iri_host) + " port " + str(self.__iri_port))
-        self.client_iri = Client(self.__iri_host, self.__iri_port, self.log)
-        self.client_cc = Client(self.__cc_host, self.__cc_port, self.log)
+        self.client_iri = Client(self.__iri_host, self.__iri_port, self.db_name, self.log)
+        self.client_cc = Client(self.__cc_host, self.__cc_port, self.db_name, self.log)
 
     def stop(self):
         self.log.info("Asterisk::setup: Trying stop service")

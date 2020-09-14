@@ -21,19 +21,20 @@ class Adm(Database):
     def add_interception(self):
         self.log.info("Adm::add_interception")
         try:
-            (lea_user,lea_password,lea_email,target,date) = self.interface.li_register()
-            url = uris.ADD_INTERCEPTION.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port']  ,"?target=" + target)
+            (lea_user,lea_password,lea_email,sftp_ip,sftp_pah,target,date,lea_port) = self.interface.li_register()
+            url = uris.ADD_INTERCEPTION.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port'])
             self.log.info("Adm::add_interception: Url: " + url)
-            (code, json, response) = self.client.http_request(Method.GET,url,False)
+            target = {"target":target}
+            (code, json, response) = self.client.http_request(Method.POST,url,False,{'content-type': 'application/json'},json.dumps(target))
             self.log.info("Adm::add_interception: code: " + str(code) + " json: " + str(json))
             if(code == 200):
                 interception_id = int(json['id'])
-                uri = json['uri']
-                self.log.info("Adm::add_interception: interception_id: " + str(interception_id) + " uri: " + str(uri))
-                self.target(target,uri)
-                lea_id = self.lea(lea_user,lea_password,lea_email)
+                cpf = json['cpf']
+                self.log.info("Adm::add_interception: interception_id: " + str(interception_id) + " cpf: " + str(cpf))
+                self.target(cpf,target)
+                lea_id = self.lea(lea_user,lea_password,lea_email,sftp_ip,sftp_pah,lea_port)
                 oficio_id = self.oficio(lea_id,date)
-                self.li(interception_id,target,oficio_id,Action.INSERT,'A')
+                self.li(interception_id,cpf,oficio_id,Action.INSERT,'A')
                 self.log.info("Adm::add_interception: interception added")
             else:
                 self.log.info("Adm::add_interception: Error to add interception")
@@ -41,18 +42,21 @@ class Adm(Database):
         except Exception as error:
             self.log.error("Adm::add_interception: error: " + str(error))
 
-    def inactivate_interception(self,id=None,interface=True):
+    def inactivate_interception(self):
         self.log.info("Adm::inactivate_interception")
+        interceptions = []
         try:
-            if(interface):
-                id = self.interface.li_unregister()
+            oficio_id = self.interface.li_unregister()
             url = uris.INACTIVE_INTERCEPTION
-            url.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port'] ,"?interception=" + str(id))
-            (code, json, response) = self.client.http_request(Method.GET,url,False)
-            if(code == 200):
-                self.li(id,None,None,Action.UPDATE,'I')
-            else:
-                self.log.info("Adm::inactivate_interception: Error to inactivate interception")
+            url.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port'])
+            interceptions = self.get_ids_interceptions(oficio_id)
+            for id in interceptions:
+                id_interception = {"id_interception":id}
+                (code, json, response) = self.client.http_request(Method.POST,url,False,{'content-type': 'application/json'},json.dumps(id_interception))
+                if(code == 200):
+                    self.li(id,None,None,Action.UPDATE,'I')
+                else:
+                    self.log.info("Adm::inactivate_interception: Error to inactivate interception")
         except Exception as error:
             self.log.error("Adm::inactivate_interception: error: " + str(error))
     
@@ -85,10 +89,10 @@ class Adm(Database):
         self.disconnect()
         return
 
-    def lea(self, user, password, email):
+    def lea(self, user, password, email,sftp_ip,sftp_pah,sftp_port):
         self.log.info("Adm::lea")
-        query = "INSERT INTO lea VALUES(?,?,?,?)"
-        values = [None,user,password,email]
+        query = "INSERT INTO lea VALUES(?,?,?,?,?,?,?)"
+        values = [None,user,password,email,sftp_ip,sftp_port,sftp_pah]
         self.connect()
         (cursor,conn) = self.execute_query(query, values)
         conn.commit()
@@ -125,6 +129,16 @@ class Adm(Database):
         (cursor,conn) = self.execute_query(query, values)
         conn.commit()
         self.disconnect()
+
+    def get_ids_interceptions(self,oficio_id):
+        interceptions = []
+        self.log.info("Adm::get_ids_interceptions: Try get interceptions when oficio is: " + str(oficio_id))
+        query = "SELECT id from li where oficio=" + str(oficio_id)
+        self.connect()
+        (cursor,conn) = self.execute_query(query)
+        interceptions = cursor.fetchall()
+        self.disconnect()
+        return interceptions
 
 
 

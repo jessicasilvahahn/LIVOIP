@@ -1,6 +1,6 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from library.database.database import Database
-from library.interception.status import Status
+from library.interception.interception import Status
 
 class Register(Database):
 
@@ -11,27 +11,31 @@ class Register(Database):
         super().__init__(db_name,log)
         self.log = log
 
-    def search_uri(self, cpf:str):
-        uri = None
-        self.log.info("Register::search_uri: target: " + cpf)
+    def search_cpf(self, uri:str):
+        cpf = None
+        id = None
+        result = None
+        self.log.info("Register::search_uri: target: " + uri)
         try:
-            query = "SELECT uri from uri where cpf=\'" + cpf + '\''
+            query = "SELECT id,cpf from uri where uri=\'" + uri + '\''
             (cursor,conn) = self.execute_query(query)
             if(cursor):
-                uri = cursor.fetchone()
-                if(uri):
-                    uri = uri[0]
+                result = cursor.fetchone()
+                self.log.debug("Register::search_uri: result: " + str(result))
+                if(result):
+                    id = result[0]
+                    cpf = result[1]
         except Exception as error:
             self.log.error("Register::search_uri: error: " + str(error))
         
         self.disconnect()
-        return uri
+        return (id,cpf)
 
-    def search_target(self, uri:str):
+    def search_target(self, uri_id):
         id = None
-        self.log.info("Register::search_target: uri: " + uri)
+        self.log.info("Register::search_target: uri id: " + uri_id)
         try:
-            query = "SELECT id from target where target=\'" + uri + '\''
+            query = "SELECT id from target where target=\'" + uri_id + '\''
             (cursor,conn) = self.execute_query(query)
             if(cursor):
                 id = cursor.fetchone()
@@ -43,14 +47,14 @@ class Register(Database):
         self.disconnect()
         return id
 
-    def add_interception(self, cpf:str):
-        self.log.info("Register::add_interception: target: " + cpf)
+    def add_interception(self, uri:str):
+        self.log.info("Register::add_interception: target: " + uri)
         target_id = None
-        uri = self.search_uri(cpf)
+        (uri_id,cpf) = self.search_cpf(uri)
         id_interception = None
-        if(uri):
+        if(cpf):
             flag = Status.ATIVO.value
-            target_id = self.search_target(uri)
+            target_id = self.search_target(uri_id)
             if(not target_id):
                 query = "INSERT INTO target VALUES(?,?)"
                 values = [None,uri]
@@ -71,9 +75,9 @@ class Register(Database):
             id_interception = (cursor.fetchone())[0]
             self.disconnect()
         else:
-            self.log.info("Register::add_interception: target: " + cpf + " not found!")
+            self.log.info("Register::add_interception: target: " + uri + " not found!")
         
-        return (id_interception,uri)
+        return (id_interception,cpf)
 
     def inactive_interception(self, id_interception:int):
         self.log.info("Register::inactive_interception: id: " + str(id_interception))

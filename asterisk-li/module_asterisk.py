@@ -33,15 +33,15 @@ class System():
             self.asterisk.start(self.parameters['iri_host'],self.parameters['iri_port'], self.parameters['cc_host'],self.parameters['cc_port'])
         
         elif(self.mode == 'iri'):
-            self.iri = Iri(self.parameters['interface'],self.parameters['protocol'],self.parameters['sip'], self.parameters['pcap'], self.parameters['host'], self.parameters['port'], self.parameters['buffer'], self.parameters['sleep'], self.log)
+            self.iri = Iri(self.parameters['interface'],self.parameters['protocol'],self.parameters['sip'], self.parameters['pcap'], self.parameters['host'], self.parameters['port'], self.parameters['buffer'], self.parameters['sleep'], self.parameters['database'], self.log)
             self.iri.start()
 
         elif(self.mode == 'cc'):
-            self.cc = Record(self.parameters['host'], self.parameters['port'], self.parameters['buffer'], self.parameters['ami_server'], self.parameters['ami_user'], self.parameters['ami_password'], self.parameters['sleep'], self.log)
+            self.cc = Record(self.parameters['host'], self.parameters['port'], self.parameters['buffer'], self.parameters['ami_server'], self.parameters['ami_user'], self.parameters['ami_password'], self.parameters['sleep'], self.parameters['database'], self.log)
             self.cc.start()
         
         elif(self.mode == 'server'):
-            self.server = Server(self.parameters['address'],self.parameters['port'],self.parameters['pcap'],self.parameters['uri'],self.parameters['user'],self.parameters['password'],self.parameters['database'],self.log)
+            self.server = Server(self.parameters['address'],self.parameters['port'],self.parameters['pcap'],self.parameters['uri'],self.parameters['user'],self.parameters['password'],self.parameters['cert'],self.parameters['key'],self.parameters['database'],self.log)
             self.server.run()
 
     def start(self, preserved_file = None):
@@ -101,7 +101,8 @@ class System():
             'sip' : self.config.getint('iri','sip_port'),
             'pcap': self.config.get('iri','path_pcap'),
             'buffer': self.config.getint('iri','buffer_size'),
-            'sleep': self.config.getint('iri','sleep_interval')}
+            'sleep': self.config.getint('iri','sleep_interval'),
+            'database': self.config.get('asterisk','database')}
 
         elif(self.mode == 'cc'):
             log_name = self.config.get('cc','log_name')
@@ -111,7 +112,8 @@ class System():
             'ami_server': self.config.get('cc','ami_server'),
             'ami_user': self.config.get('cc','ami_user'),
             'ami_password': self.config.get('cc','ami_password'),
-            'sleep': self.config.getint('cc','sleep_interval')}
+            'sleep': self.config.getint('cc','sleep_interval'),
+            'database': self.config.get('asterisk','database')}
         
         elif(self.mode == 'server'):
             log_name = self.config.get('server','log_name')
@@ -121,7 +123,9 @@ class System():
             'port': self.config.getint('server','port'),
             'user': self.config.get('server','user'),
             'password': self.config.get('server','password'),
-            'database': self.config.get('server','database')}
+            'database': self.config.get('server','database'),
+            'cert': self.config.get('server','cert'),
+            'key': self.config.get('server','key')}
             
         self.log_handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=self.config.getint('log', 'size'),
                                                        backupCount=self.config.getint('log', 'backups'))

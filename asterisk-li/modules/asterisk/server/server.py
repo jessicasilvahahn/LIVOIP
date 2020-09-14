@@ -1,6 +1,6 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from urllib import parse
-from library.ari.server import Server
+from library.ari.server import HTTPS
 from http.server import BaseHTTPRequestHandler
 from os.path import exists
 from os.path import join
@@ -8,6 +8,9 @@ import base64
 from modules.asterisk.register.register import Register
 from library.ari import uris
 import json
+from library.database.database import Database
+from urllib import parse
+from urllib.parse import parse_qs
 
 class Pcap():
 
@@ -31,8 +34,34 @@ class Auth():
 pcap = Pcap()
 auth  = Auth()
 register = Register()
+database = Database(None,None)
 
 class Handler(BaseHTTPRequestHandler):
+
+    def get_files(self, table, interception_id, call_id):
+        self.log.debug("Server::get_files: " + str(table))
+        file = None
+        result = None
+        query = "SELECT " + str(table) + " from " + str(table) + " where call_id=" + str(call_id) + " and interception_id=" + interception_id
+        database.connect()
+        (cursor,conn) = self.database.execute_query(query)
+        if(cursor):
+            result = cursor.fetchone()
+            if(result):
+                name_file = result[0]
+                file = {"file": name_file}
+        
+        return file
+
+
+    def format_json(self, msg):
+        self.log.debug("Server::format_json: " + str(msg))
+        msg_json = (json.dumps(msg)).encode('utf-8')
+        self.send_response(200)
+        self.send_header('Content-type','application/json')
+        self.send_header('Content-Length',str(len(msg_json)))
+        self.end_headers()
+        return msg_json
 
     def do_AUTHHEAD(self):
         self.send_response(401)
@@ -51,7 +80,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if(self.headers['Authorization'] == None):
                 self.do_AUTHHEAD()
-                self.wfile.write(bytes('no auth header received', 'UTF-8'))
+                self.wfile.write(bytes('No auth header received', 'UTF-8'))
                 return
 
             credentials = self.headers.get('Authorization')
@@ -60,67 +89,123 @@ class Handler(BaseHTTPRequestHandler):
                 self.log.warnning("Server::do_GET: Alert: Not auth! , login: " + str(credentials))
                 self.send_response(200)
                 self.end_headers()
-                self.wfile.write('Not auth!'.encode('utf-8'))
+                self.wfile.write('You are not authorized to enter this application!'.encode('utf-8'))
+                return
+        parsed_path = (parse.urlparse(self.path)).path
+        self.log.debug("Server::do_GET: " + str(parsed_path))
+        if(parsed_path == pcap.uri):
+            parameters = parse_qs(parse(self.path).query)
+            self.log.debug("Server::do_GET: parameters" + str(parameters))
+            name_file = join(pcap.path,parameters["file"])
+            if(exists(name_file)):
+                self.HEADER(name_file)
+                with open(name_file, 'rb') as reader:
+                    bytes_line = reader.read()
+                    while(bytes_line):
+                        self.wfile.write(bytes_line)
+                        bytes_line = reader.read()
+                return
+            else:
+                msg = "File not exists!"
+        else:
+            msg = "URL not exists!"
+
+        self.send_response(200)
+        self.send_header('Content-type','text/plain')
+        self.end_headers()
+        self.wfile.write(msg.encode('utf-8'))
+
+        except Exception as error:
+            self.log.debug("Server::do_GET: error: " + str(error))
+
+    
+    def do_POST(self):
+        try:
+            if(self.headers['Authorization'] == None):
+                self.do_AUTHHEAD()
+                self.wfile.write(bytes('No auth header received', 'UTF-8'))
+                return
+
+            credentials = self.headers.get('Authorization')
+            is_auth = self.auth(credentials)
+            if(not is_auth):
+                self.log.warnning("Server::do_POST: Alert: Not auth! , login: " + str(credentials))
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write('You are not authorized to enter this application!'.encode('utf-8'))
                 return
             
             msg = ""
             id_interception = None
             uri = None
+            body = None
             parsed_path = (parse.urlparse(self.path)).path
-            self.log.debug("Server::do_GET: " + str(parsed_path))
-            if(parsed_path == pcap.uri):
-                if("?" in self.path):
-                    for key,value in dict(parse.parse_qsl(self.path.split("?")[1], True)).items():
-                        print(str(key) + str(value))
-                        if(key == 'file'):
-                            name = join(pcap.path,value)
-                            if(exists(name)):
-                                self.HEADER(value)
-                                with open(name, 'rb') as reader:
-                                    bytes_line = reader.read()
-                                    while(bytes_line):
-                                        self.wfile.write(bytes_line)
-                                        bytes_line = reader.read()
-                                return
-                            else:
-                                msg = "File not exists!"
-            
-            elif(parsed_path == uris.ADD_INTERCEPTION.format("","")):
-                self.log.debug("Server::do_GET: ADD_INTERCEPTION")
-                if("?" in self.path):
-                    for key,value in dict(parse.parse_qsl(self.path.split("?")[1], True)).items():
-                        self.log.debug("Server::do_GET: ADD_INTERCEPTION, " + str(key) + ", " + str(value))
-                        if(key == 'target'):
-                            target = value
-                            (id_interception,uri) = register.add_interception(target)
-                            msg = {"id": id_interception,"uri": uri}
-                        else:
-                            msg = {"error": "Key is not valid!"}
+            self.log.debug("Server::do_POST: " + str(parsed_path))
+            if(parsed_path == uris.ADD_INTERCEPTION.format("")):
+                target = None
+                self.log.debug("Server::do_POST: ADD_INTERCEPTION")
+                if(self.headers['Content-Type'] == 'application/json'):
+                    content_length = int(self.headers['Content-Length'])
+                    body = self.rfile.read(content_length)
+                    target = json.loads(body.decode()))["target"]
+                    (id_interception,cpf) = register.add_interception(target)
+                    msg = {"id": id_interception,"cpf": cpf}
                         
-                        self.log.debug("Server::do_GET: msg: " + str(msg))
-                        msg_json = (json.dumps(msg)).encode('utf-8')
-                        self.send_response(200)
-                        self.send_header('Content-type','application/json')
-                        self.send_header('Content-Length',str(len(msg_json)))
-                        self.end_headers()
-                        self.wfile.write(msg_json)
-                        return
+                else:
+                    msg = {"error": "Header content-type not valid!"}
+                        
+                self.log.debug("Server::do_POST: msg: " + str(msg))
+                msg_json = self.format_json(msg)
+                self.log.debug("Server::do_POST: json: " + str(msg_json))
+                self.wfile.write(msg_json)
+                return
 
 
-            elif(parsed_path == uris.INACTIVE_INTERCEPTION.format("","")):
-                self.log.debug("Server::do_GET: INACTIVE_INTERCEPTION")
-                if("?" in self.path):
-                    for key,value in dict(parse.parse_qsl(self.path.split("?")[1], True)).items():
-                        self.log.debug("Server::do_GET: INACTIVE_INTERCEPTION, " + str(key) + ", " + str(value))
-                        if(key == 'interception'):
-                            id_interception = int(value)
-                            if(register.inactive_interception(id_interception)):
-                                msg = "OK"
-                        else:
-                            msg = "Key is not valid!"
+            elif(parsed_path == uris.INACTIVE_INTERCEPTION.format("")):
+                self.log.debug("Server::do_POST: INACTIVE_INTERCEPTION")
+                if(self.headers['Content-Type'] == 'application/json'):
+                    content_length = int(self.headers['Content-Length'])
+                    body = self.rfile.read(content_length)
+                    id_interception = int(json.loads(body.decode())["id_interception"])
+                    if(register.inactive_interception(id_interception)):
+                        msg = "OK"
+                    else:
+                        msg = "Problem to delete interception!"
+            
+            elif(parsed_path == uris.GET_IRI.format("")):
+                self.log.debug("Server::do_POST::GET_IRI")
+                file = None
+                call_id = None
+                interception_id = None
+                if(self.headers['Content-Type'] == 'application/json'):
+                    content_length = int(self.headers['Content-Length'])
+                    body = self.rfile.read(content_length)
+                    call_id = json.loads(body.decode())["call_id"]
+                    interception_id = json.loads(body.decode())["interception_id"]
+                    file = self.get_files("iri", interception_id, call_id)
+                
+                msg_json = self.format_json(file)
+                self.log.debug("Server::do_POST::GET_IRI: json" + str(msg_json))
+                self.wfile.write(msg_json)
+
+            elif(parsed_path == uris.GET_CC.format("")):
+                self.log.debug("Server::do_POST::GET_CC")
+                file = None
+                call_id = None
+                interception_id = None
+                if(self.headers['Content-Type'] == 'application/json'):
+                    content_length = int(self.headers['Content-Length'])
+                    body = self.rfile.read(content_length)
+                    call_id = json.loads(body.decode())["call_id"]
+                    interception_id = json.loads(body.decode())["interception_id"]
+                    file = self.get_files("cc", interception_id, call_id)
+                
+                msg_json = self.format_json(file)
+                self.log.debug("Server::do_POST::GET_CC: json" + str(msg_json))
+                self.wfile.write(msg_json)
             else:
                 msg = "Path not exists!"
-                self.log.warning("Server::do_GET: Alert: " + str(msg))
+                self.log.warning("Server::cc_name: Alert: " + str(msg))
         
             self.send_response(200)
             self.send_header('Content-type','text/plain')
@@ -128,7 +213,7 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(msg.encode('utf-8'))
         
         except Exception as error:
-            self.log.debug("Server::do_GET: error: " + str(error))
+            self.log.debug("Server::do_POST: error: " + str(error))
 
     def auth(self,credentials:str):
         credentials_split = credentials.split(" ")
@@ -140,14 +225,15 @@ class Handler(BaseHTTPRequestHandler):
         return False
 
 
-class Server(Server):
+class Server(HTTPS):
     
-    def __init__(self, address, port, path_pcap, uri, user, password, db_name, log):
+    def __init__(self, address, port, path_pcap, uri, user, password, cert, private_key, db_name, log):
         self.log = log
         pcap.set(path_pcap,uri)
         auth.set(user, password)
         register.set(log,db_name)
-        super().__init__(address,port,Handler,log)
+        database.set_attributes(db_name,log)
+        super().__init__(address,port,private_key,cert,Handler,log)
         
     
     def run(self):

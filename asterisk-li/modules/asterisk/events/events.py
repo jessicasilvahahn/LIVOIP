@@ -3,26 +3,32 @@ import time
 from functools import partial
 from os import rename
 from os.path import join
-from library.events.asterisk import Record
-from library.events.asterisk import Status
+from asterisk import Record
+from asterisk import Status
 from library.ami.ami import Ami
 from queue import Queue
+from  itertools import chain
+from library.interception import interception
+from library.database.database import Database
 
 
 class Events(Ami):
     """Communication with AMI Asterisk"""
-    def __init__(self, server:str, user:str, password:str, interceptions:Queue, log):
+    def __init__(self, server:str, user:str, password:str, interceptions:Queue, db_name:str, log):
         super().__init__(server,user,password,log)
         self.log = log
         #fila de itcs
         self.interceptions = interceptions
         self.targets_recording = []
+        self.database = Database(db_name=db_name,log=log)
     
-    def callback_action_record_call(self, future):
+    def callback_action_record_call(self, future, call_id, file_name, target, targets):
         self.log.info("Events::callback_action_record_call: Result: " + str(future.result()))
         response = (future.result())['Response']
         if(response == 'Success'):
-            self.log.info("Events::callback_action_record_call: Record save with sucess")               
+            self.log.info("Events::callback_action_record_call: Record save with sucess")
+
+            self.save_cc_name(file_name, call_id, target, targets)             
         return
             
     
@@ -37,6 +43,7 @@ class Events(Ami):
         self.log.info("Events::start_record_call")
         try:
             target = None
+            call_id = ""
             target_id_source = None
             target_id_detination = None
             channel = None
@@ -53,10 +60,10 @@ class Events(Ami):
                     self.log.info("Target destination: " + str(target_id_destination) + "\n")
                     self.log.info("Status: " + status)
                     if(status == Status.ANSWER.value):
-                        if(target_id_source in targets):
+                        if(target_id_source in chain(*targets)):
                             channel = event['Channel']
                             target = target_id_source
-                        elif(target_id_destination in targets):
+                        elif(target_id_destination in chain(*targets)):
                             channel = event['DestChannel']
                             target = target_id_destination
 
@@ -65,11 +72,12 @@ class Events(Ami):
                         self.log.info("Events::start_record_call: Targets: " + str(self.targets_recording))
                         self.log.info("Events::start_record_call: target " + str(target) + " answered from channel " + str(channel))
                         #call-ID do sip
-                        file_name = (event['AccountCode'])[0:20]
+                        call_id = (event['AccountCode'])[0:20]
+                        file_name = interception.get_cc_name(target)
                         path_file = join(Record.PATH.value,file_name + Record.FORMAT.value)
                         self.log.info("Events::start_record_call: Trying record call with name file " + str(path_file))
                         future = manager.send_action({'Action': 'MixMonitor', 'Channel': channel, 'File': path_file})
-                        future.add_done_callback(partial(self.callback_action_record_call))
+                        future.add_done_callback(partial(self.callback_action_record_call, call_id, file_name, target, targets))
                 return
         
         except Exception as error:
@@ -103,6 +111,22 @@ class Events(Ami):
         self.log.info("Events::event_start_call")
         callback = self.start_record_call
         self.register_event('DialEnd',callback)
+
+    def save_cc_name(self, cc, call_id, target, targets):
+        self.log.info("Events::save_cc_name: Trying save file " + cc + " with call id " + call_id + " and uri " + uri)
+        interceptions_ids = []
+        for item in self.targets:
+            if(item[1] == target):
+                interceptions_ids.append(item[0])
+
+        self.log.info("Events::save_cc_name: interceptions id list " + str(interceptions_ids))
+        self.database.connect()
+        for interception_id in interceptions_ids:
+            query = "INSERT INTO cc VALUES(?,?,?,?)"
+            values = [None,name_file,call_id,interception_id]
+            (cursor,conn) = self.execute_query(query,values)
+            conn.commit()
+        self.database.disconnect()
 
 
 

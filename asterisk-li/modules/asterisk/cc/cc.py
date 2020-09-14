@@ -1,5 +1,5 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
-from library.events.events import Events
+from modules.asterisk.events.events import Events
 from library.socket.tcp import Server
 from library.database.database import Database
 import threading
@@ -8,11 +8,11 @@ import time
 
 class Record(Events):
 
-    def __init__(self, host, port, buffer_size, ami_server, ami_user, ami_password, sleep, log):
+    def __init__(self, host, port, buffer_size, ami_server, ami_user, ami_password, sleep, db_name, log):
         self.log = log
         self.sleep = sleep
         self.interceptions = Queue()
-        super().__init__(ami_server, ami_user, ami_password, self.interceptions, log)
+        super().__init__(ami_server, ami_user, ami_password, self.interceptions, db_name, log)
         self.server = Server(host, port, buffer_size, log)
         self.socket = None
         self.record = None
