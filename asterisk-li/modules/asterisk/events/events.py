@@ -3,8 +3,8 @@ import time
 from functools import partial
 from os import rename
 from os.path import join
-from asterisk import Record
-from asterisk import Status
+from modules.asterisk.events.asterisk import Record
+from modules.asterisk.events.asterisk import Status
 from library.ami.ami import Ami
 from queue import Queue
 from  itertools import chain

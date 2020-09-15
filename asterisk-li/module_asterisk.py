@@ -41,7 +41,7 @@ class System():
             self.cc.start()
         
         elif(self.mode == 'server'):
-            self.server = Server(self.parameters['address'],self.parameters['port'],self.parameters['pcap'],self.parameters['uri'],self.parameters['user'],self.parameters['password'],self.parameters['cert'],self.parameters['key'],self.parameters['database'],self.log)
+            self.server = Server(self.parameters['address'],self.parameters['port'],self.parameters['pcap'],self.parameters['uri'],self.parameters['user'],self.parameters['password'],self.parameters['database'],self.log)
             self.server.run()
 
     def start(self, preserved_file = None):
@@ -123,9 +123,7 @@ class System():
             'port': self.config.getint('server','port'),
             'user': self.config.get('server','user'),
             'password': self.config.get('server','password'),
-            'database': self.config.get('server','database'),
-            'cert': self.config.get('server','cert'),
-            'key': self.config.get('server','key')}
+            'database': self.config.get('server','database')}
             
         self.log_handler = logging.handlers.RotatingFileHandler(log_name, maxBytes=self.config.getint('log', 'size'),
                                                        backupCount=self.config.getint('log', 'backups'))

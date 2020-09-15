@@ -1,7 +1,7 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from urllib import parse
 from library.ari.server import HTTPS
-from http.server import BaseHTTPRequestHandler
+from library.ari.server import BaseHTTPRequestHandler
 from os.path import exists
 from os.path import join
 import base64
@@ -86,34 +86,34 @@ class Handler(BaseHTTPRequestHandler):
             credentials = self.headers.get('Authorization')
             is_auth = self.auth(credentials)
             if(not is_auth):
-                self.log.warnning("Server::do_GET: Alert: Not auth! , login: " + str(credentials))
+                self.log.info("Server::do_GET: Alert: Not auth! , login: " + str(credentials))
                 self.send_response(200)
                 self.end_headers()
                 self.wfile.write('You are not authorized to enter this application!'.encode('utf-8'))
                 return
-        parsed_path = (parse.urlparse(self.path)).path
-        self.log.debug("Server::do_GET: " + str(parsed_path))
-        if(parsed_path == pcap.uri):
-            parameters = parse_qs(parse(self.path).query)
-            self.log.debug("Server::do_GET: parameters" + str(parameters))
-            name_file = join(pcap.path,parameters["file"])
-            if(exists(name_file)):
-                self.HEADER(name_file)
-                with open(name_file, 'rb') as reader:
-                    bytes_line = reader.read()
-                    while(bytes_line):
-                        self.wfile.write(bytes_line)
+            parsed_path = (parse.urlparse(self.path)).path
+            self.log.debug("Server::do_GET: " + str(parsed_path))
+            if(parsed_path == pcap.uri):
+                parameters = parse_qs(parse(self.path).query)
+                self.log.debug("Server::do_GET: parameters" + str(parameters))
+                name_file = join(pcap.path,parameters["file"])
+                if(exists(name_file)):
+                    self.HEADER(name_file)
+                    with open(name_file, 'rb') as reader:
                         bytes_line = reader.read()
-                return
+                        while(bytes_line):
+                            self.wfile.write(bytes_line)
+                            bytes_line = reader.read()
+                    return
+                else:
+                    msg = "File not exists!"
             else:
-                msg = "File not exists!"
-        else:
-            msg = "URL not exists!"
+                msg = "URL not exists!"
 
-        self.send_response(200)
-        self.send_header('Content-type','text/plain')
-        self.end_headers()
-        self.wfile.write(msg.encode('utf-8'))
+            self.send_response(200)
+            self.send_header('Content-type','text/plain')
+            self.end_headers()
+            self.wfile.write(msg.encode('utf-8'))
 
         except Exception as error:
             self.log.debug("Server::do_GET: error: " + str(error))
@@ -129,7 +129,7 @@ class Handler(BaseHTTPRequestHandler):
             credentials = self.headers.get('Authorization')
             is_auth = self.auth(credentials)
             if(not is_auth):
-                self.log.warnning("Server::do_POST: Alert: Not auth! , login: " + str(credentials))
+                self.log.info("Server::do_POST: Alert: Not auth! , login: " + str(credentials))
                 self.send_response(200)
                 self.end_headers()
                 self.wfile.write('You are not authorized to enter this application!'.encode('utf-8'))
@@ -147,7 +147,7 @@ class Handler(BaseHTTPRequestHandler):
                 if(self.headers['Content-Type'] == 'application/json'):
                     content_length = int(self.headers['Content-Length'])
                     body = self.rfile.read(content_length)
-                    target = json.loads(body.decode()))["target"]
+                    target = json.loads(body.decode())["target"]
                     (id_interception,cpf) = register.add_interception(target)
                     msg = {"id": id_interception,"cpf": cpf}
                         
@@ -205,7 +205,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(msg_json)
             else:
                 msg = "Path not exists!"
-                self.log.warning("Server::cc_name: Alert: " + str(msg))
+                self.log.info("Server::cc_name: Alert: " + str(msg))
         
             self.send_response(200)
             self.send_header('Content-type','text/plain')
@@ -227,14 +227,13 @@ class Handler(BaseHTTPRequestHandler):
 
 class Server(HTTPS):
     
-    def __init__(self, address, port, path_pcap, uri, user, password, cert, private_key, db_name, log):
+    def __init__(self, address, port, path_pcap, uri, user, password, db_name, log):
         self.log = log
         pcap.set(path_pcap,uri)
         auth.set(user, password)
         register.set(log,db_name)
         database.set_attributes(db_name,log)
-        super().__init__(address,port,private_key,cert,Handler,log)
-        
+        super().__init__(address,port,Handler,log)
     
     def run(self):
         try:

@@ -12,7 +12,7 @@ class Interface():
         lea_email = input("E-mail\n")
         lea_port = input("SFTP port server")
         print("Entrega por SFTP?\n")
-        sftp = input("Y\N")
+        sftp = input("Y or N")
         if(sftp == 'Y' or sftp == 'y'):
             print("****SFTP*****")
             ip = input("IP")
