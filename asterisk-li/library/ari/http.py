@@ -33,9 +33,9 @@ class Http():
 			if(http_method == Method.GET):
 				if(self.server_parameters["user"] and self.server_parameters["password"]):
 					response = requests.get(uri, auth=(self.server_parameters["user"], 
-						self.server_parameters["password"]), timeout=self.timeout, headers=headers, stream=is_stream)
+						self.server_parameters["password"]), timeout=self.timeout, headers=headers, stream=is_stream, verify=False)
 				else:
-					response = requests.get(uri, timeout=self.timeout, headers=headers, stream=is_stream)
+					response = requests.get(uri, timeout=self.timeout, headers=headers, stream=is_stream, verify=False)
 
 			elif(http_method == Method.POST):
 				if(self.server_parameters["user"] and self.server_parameters["password"]):
