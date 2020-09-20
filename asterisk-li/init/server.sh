@@ -2,13 +2,13 @@
  
 start() {
   echo 'Trying start service!'
-  /opt/tools/Python-3.6.7/bin/python3 /opt/ali/module_asterisk.pyc -d /var/run/asterisk.pid -c /opt/ali/conf/asterisk.conf
+  /opt/tools/Python-3.6.7/bin/python3 /opt/ali/module_asterisk.pyc -d /var/run/server.pid -c /opt/ali/conf/server.conf
 
 }
   
 stop() {
   echo 'Trying stoping service!'
-  kill $(cat /var/run/asterisk.pid)
+  kill $(cat /var/run/server.pid)
 }
 
 restart() {
@@ -28,4 +28,7 @@ case "$1" in
     ;;
   *)
     echo $"Usage: $0 {start|stop|restart}"
+    exit 1
 esac
+  
+exit $?

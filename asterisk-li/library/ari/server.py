@@ -31,6 +31,6 @@ class HTTPS(HTTPServer):
         self.RequestHandlerClass.password = None
 
     def run(self):
-        self.context.load_cert_chain("/opt/li-asterisk/certs/cert_and_key.pem",password="asterisk")
+        self.context.load_cert_chain("/opt/ali/certs/cert.pem",password="asterisk")
         self.socket = self.context.wrap_socket(self.socket, server_side=True)
         self.serve_forever()

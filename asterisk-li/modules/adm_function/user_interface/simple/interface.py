@@ -10,13 +10,13 @@ class Interface():
         lea_user = input("Usuario\n")
         lea_password = input("Senha\n")
         lea_email = input("E-mail\n")
-        lea_port = input("SFTP port server")
+        lea_port = input("SFTP port server\n")
         print("Entrega por SFTP?\n")
-        sftp = input("Y or N")
+        sftp = input("Y or N\n")
         if(sftp == 'Y' or sftp == 'y'):
-            print("****SFTP*****")
-            ip = input("IP")
-            path = input("Path")
+            print("****SFTP*****\n")
+            ip = input("IP\n")
+            path = input("Path\n")
         
         return (lea_user,lea_password,lea_email,ip,path,int(lea_port))
 

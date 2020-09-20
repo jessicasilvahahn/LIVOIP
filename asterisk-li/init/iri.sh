@@ -2,13 +2,14 @@
  
 start() {
   echo 'Trying start service!'
-  /opt/li-asterisk/tools/Python-3.6.7/bin/python3 /opt/ali/module_asterisk.pyc -d /var/run/iri.pid -c /opt/ali/modules/asterisk/conf/iri.conf
+  /opt/tools/Python-3.6.7/bin/python3 /opt/ali/module_asterisk.pyc -d /var/run/iri.pid -c /opt/ali/conf/iri.conf
 
 }
   
 stop() {
   echo 'Trying stoping service!'
   kill $(cat /var/run/iri.pid)
+}
 
 restart() {
   stop

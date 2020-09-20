@@ -6,6 +6,8 @@ from library.ari.http import Method
 from library.ari import uris
 import json
 from enum import Enum
+import urllib3
+
 
 class Action(Enum):
     INSERT = 0
@@ -17,6 +19,7 @@ class Adm(Database):
         self.interface = Interface()
         super().__init__(db_name,log)
         self.client = Http(host, port, user, password, timeout)
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     
     def add_interception(self):
         self.log.info("Adm::add_interception")
@@ -25,13 +28,13 @@ class Adm(Database):
             url = uris.ADD_INTERCEPTION.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port'])
             self.log.info("Adm::add_interception: Url: " + url)
             target = {"target":target}
-            (code, json, response) = self.client.http_request(Method.POST,url,False,{'content-type': 'application/json'},json.dumps(target))
-            self.log.info("Adm::add_interception: code: " + str(code) + " json: " + str(json))
+            (code, json_response, response) = self.client.http_request(Method.POST,url,False,{'content-type': 'application/json'},json.dumps(target))
+            self.log.info("Adm::add_interception: code: " + str(code) + " json: " + str(json_response))
             if(code == 200):
-                interception_id = int(json['id'])
-                cpf = json['cpf']
+                interception_id = int(json_response['id'])
+                cpf = json_response['cpf']
                 self.log.info("Adm::add_interception: interception_id: " + str(interception_id) + " cpf: " + str(cpf))
-                self.target(cpf,target)
+                self.target(cpf,target['target'])
                 lea_id = self.lea(lea_user,lea_password,lea_email,sftp_ip,sftp_pah,lea_port)
                 oficio_id = self.oficio(lea_id,date)
                 self.li(interception_id,cpf,oficio_id,Action.INSERT,'A')
@@ -47,16 +50,19 @@ class Adm(Database):
         interceptions = []
         try:
             oficio_id = self.interface.li_unregister()
-            url = uris.INACTIVE_INTERCEPTION
-            url.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port'])
+            url = uris.INACTIVE_INTERCEPTION.format(self.client.server_parameters['host'] + ':' + self.client.server_parameters['port'])
+            self.log.debug("Adm::inactivate_interception: url: " + str(url))
             interceptions = self.get_ids_interceptions(oficio_id)
-            for id in interceptions:
-                id_interception = {"id_interception":id}
-                (code, json, response) = self.client.http_request(Method.POST,url,False,{'content-type': 'application/json'},json.dumps(id_interception))
-                if(code == 200):
-                    self.li(id,None,None,Action.UPDATE,'I')
-                else:
-                    self.log.info("Adm::inactivate_interception: Error to inactivate interception")
+            if(interceptions):
+                for id in interceptions:
+                    id_interception = {"id_interception":id[0]}
+                    self.log.debug("Adm::inactivate_interception: id interception: " + str(id_interception))
+                    (code, json_response, response) = self.client.http_request(Method.POST,url,False,{'content-type': 'application/json'},json.dumps(id_interception))
+                    self.log.debug("Adm::inactivate_interception: code: " + str(code))
+                    if(code == 200):
+                        self.li(id[0],None,None,Action.UPDATE,'I')
+                    else:
+                        self.log.info("Adm::inactivate_interception: Error to inactivate interception")
         except Exception as error:
             self.log.error("Adm::inactivate_interception: error: " + str(error))
     
@@ -83,6 +89,7 @@ class Adm(Database):
             return
         query = "INSERT INTO target VALUES(?,?)"
         values = [cpf,new_uri]
+        self.log.info("Adm::target: values: " + str(values))
         self.connect()
         (cursor,conn) = self.execute_query(query, values)
         conn.commit()
@@ -132,7 +139,7 @@ class Adm(Database):
 
     def get_ids_interceptions(self,oficio_id):
         interceptions = []
-        self.log.info("Adm::get_ids_interceptions: Try get interceptions when oficio is: " + str(oficio_id))
+        self.log.info("Adm::get_ids_interceptions: Try get interceptions when oficio ids: " + str(oficio_id))
         query = "SELECT id from li where oficio=" + str(oficio_id)
         self.connect()
         (cursor,conn) = self.execute_query(query)

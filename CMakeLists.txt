@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.13.4)
 
 set(PYTHON_VERSION "3.6.7" CACHE STRING "The version of Python to build.")
-set(PYTHON_DIR /opt/li-asterisk/tools/Python-${PYTHON_VERSION})
+set(PYTHON_DIR /opt/tools/Python-${PYTHON_VERSION})
 
 set(CMAKE_INSTALL_PREFIX "/opt/ali")
 
@@ -59,6 +59,8 @@ install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build/asterisk-li/logs" DESTINATI
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build/asterisk-li/library" DESTINATION ".")
 
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build/asterisk-li/modules" DESTINATION ".")
+
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build/asterisk-li/certs" DESTINATION ".")
 
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build/asterisk-li/init" DESTINATION "." USE_SOURCE_PERMISSIONS)
 

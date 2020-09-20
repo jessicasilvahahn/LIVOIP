@@ -54,26 +54,27 @@ class Register(Database):
         id_interception = None
         if(cpf):
             flag = Status.ATIVO.value
-            target_id = self.search_target(uri_id)
-            if(not target_id):
-                query = "INSERT INTO target VALUES(?,?)"
-                values = [None,uri]
-                self.connect()
+            if(uri_id):
+                target_id = self.search_target(str(uri_id))
+                if(not target_id):
+                    query = "INSERT INTO target VALUES(?,?)"
+                    values = [None,uri]
+                    self.connect()
+                    (cursor,conn) = self.execute_query(query,values)
+                    conn.commit()
+                    query = "SELECT MAX(id) from target;"
+                    (cursor,conn) = self.execute_query(query)
+                    target_id = cursor.fetchone()
+                    target_id = target_id[0]
+                
+                query = "INSERT INTO interception VALUES(?,?,?)"
+                values = [None,target_id,flag]
                 (cursor,conn) = self.execute_query(query,values)
                 conn.commit()
-                query = "SELECT MAX(id) from target;"
+                query = "SELECT MAX(id) from interception;"
                 (cursor,conn) = self.execute_query(query)
-                target_id = cursor.fetchone()
-                target_id = target_id[0]
-            
-            query = "INSERT INTO interception VALUES(?,?,?)"
-            values = [None,target_id,flag]
-            (cursor,conn) = self.execute_query(query,values)
-            conn.commit()
-            query = "SELECT MAX(id) from interception;"
-            (cursor,conn) = self.execute_query(query)
-            id_interception = (cursor.fetchone())[0]
-            self.disconnect()
+                id_interception = (cursor.fetchone())[0]
+                self.disconnect()
         else:
             self.log.info("Register::add_interception: target: " + uri + " not found!")
         
@@ -84,7 +85,7 @@ class Register(Database):
         try:
             self.connect()
             query = "UPDATE interception SET flag=\'" + Status.INATIVO.value + "\' where id=" + str(id_interception)
-            (cursor,conn) = self.database.execute_query(query)
+            (cursor,conn) = self.execute_query(query)
             conn.commit()
             self.disconnect()
             return True

@@ -40,7 +40,7 @@ class Asterisk(Database):
                         self.log.debug("Asterisk::get_targets: uri and interception_id: " + str(interceptions_dict))
                         interceptions.append((interception_id, uri))
         self.disconnect()
-        self.debug("Asterisk::get_targets: interceptions list: " + str(interceptions))
+        self.log.debug("Asterisk::get_targets: interceptions list: " + str(interceptions))
         return interceptions
 
     def setup(self):

@@ -2,7 +2,7 @@
  
 start() {
   echo 'Trying start service!'
-  /opt/li-asterisk/tools/Python-3.6.7/bin/python3 /opt/ali/module_adm.pyc -c /opt/ali/modules/adm_function/conf/adm_add.conf
+  /opt/tools/Python-3.6.7/bin/python3 /opt/ali/module_adm.pyc -c /opt/ali/conf/adm_add.conf
 
 }
   
