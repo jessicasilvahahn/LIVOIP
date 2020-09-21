@@ -37,7 +37,6 @@ class Asterisk(Database):
                         uri = cursor.fetchone()
                         self.log.debug("Asterisk::get_targets: uri: " + str(uri))
                         uri = uri[0]
-                        self.log.debug("Asterisk::get_targets: uri and interception_id: " + str(interceptions_dict))
                         interceptions.append((interception_id, uri))
         self.disconnect()
         self.log.debug("Asterisk::get_targets: interceptions list: " + str(interceptions))

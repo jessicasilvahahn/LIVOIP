@@ -58,7 +58,7 @@ class Register(Database):
                 target_id = self.search_target(str(uri_id))
                 if(not target_id):
                     query = "INSERT INTO target VALUES(?,?)"
-                    values = [None,uri]
+                    values = [None,uri_id]
                     self.connect()
                     (cursor,conn) = self.execute_query(query,values)
                     conn.commit()
