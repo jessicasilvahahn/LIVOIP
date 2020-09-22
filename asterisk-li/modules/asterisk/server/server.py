@@ -42,7 +42,14 @@ class Handler(BaseHTTPRequestHandler):
         self.log.debug("Server::get_files: " + str(table))
         file = None
         result = None
+        proxy = False
+        
         query = "SELECT " + str(table) + " from " + str(table) + " where call_id=" + str(call_id) + " and interception_id=" + interception_id
+
+        if(table == "iri"):
+            proxy = True
+            query = "SELECT " + str(table) + ",proxy from " + str(table) + " where call_id=" + str(call_id) + " and interception_id=" + interception_id
+
         database.connect()
         (cursor,conn) = self.database.execute_query(query)
         if(cursor):
@@ -50,6 +57,10 @@ class Handler(BaseHTTPRequestHandler):
             if(result):
                 name_file = result[0]
                 file = {"file": name_file}
+                if(proxy):
+                    file = {"file": name_file, "proxy": result[1]}
+
+                
         
         return file
 

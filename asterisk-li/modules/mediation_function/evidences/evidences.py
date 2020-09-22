@@ -60,18 +60,20 @@ class Evidences():
         state = False
         interception_id = str(interception_id)
         iri_name = None
+        proxy_name = None
         self.log.info("Evidences::get_iri: call_id: " + str(call_id) + " interception_id: " + interception_id)
         iri_name = self.get_file_name(call_id,interception_id,"iri")
+        proxy_name = iri_name['proxy']
+        iri_name = iri_name['file']
         if(iri_name):
-            iri_name = iri_name + ".pcap"
             host = self.iri_client.server_parameters['host'] + ':' + self.iri_client.server_parameters['port']
             url = GET_PCAP.format(host) + "?file=" + str(iri_name)
             (code, json, response) = self.iri_client.http_request(Method.GET,url,True,None)
             self.log.info("Evidences::get_iri: Status code: " + str(code))
             if(code == 200):
                 self.log.info("Evidences::get_iri: Trying save file: " + str(iri_name))
-                new_path = join(new_path_iri,name)
-                pcap_a = new_path + ".A"
+                new_path = join(new_path_iri,iri_name)
+                pcap_a = new_path
                 file = open(pcap_a, 'wb')
                 for chunk in response.iter_content(self.iri_buffer):
                     file.write(chunk)
@@ -79,7 +81,7 @@ class Evidences():
                 proxy = iri_name + '.B'
                 new_path = join(new_path_iri, proxy)
                 pcap_b = new_path
-                state = self.get_iri_proxy(proxy,new_path)
+                state = self.get_iri_proxy(proxy_name,new_path)
                 if(state):
                     state = self.join_pcap(pcap_a, pcap_b, new_path)
         
@@ -142,7 +144,6 @@ class Evidences():
         (code, response_json, response) = client.http_request(Method.POST,url,False,{'Content-Type':'application/json'},data)
         if(code == 200):
             file_name = json.loads(response_json)
-            file_name = file_name["file"]
             self.log.info("Evidences::get_file_name: file: " + str(file_name))
 
         return file_name
@@ -153,6 +154,7 @@ class Evidences():
         cc_name = None
         self.log.info("Evidences::get_cc: call_id: " + str(call_id) + " interception_id: " + interception_id)
         cc_name = self.get_file_name(call_id,interception_id,"cc")
+        cc_name = cc_name["file"]
         if(cc_name):
             host = self.cc_client.server_parameters['host'] + ':' + self.cc_client.server_parameters['port']
             self.log.info("Evidences::get_cc: host: " + str(host))
