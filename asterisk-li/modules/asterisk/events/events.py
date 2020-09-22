@@ -20,15 +20,18 @@ class Events(Ami):
         #fila de itcs
         self.interceptions = interceptions
         self.targets_recording = []
-        self.database = Database(db_name=db_name,log=log)
+        self.database = Database(db_name,log)
     
-    def callback_action_record_call(self, future, call_id, file_name, target, targets):
+    def callback_action_record_call(self, call_id, file_name, target, targets, future):
         self.log.info("Events::callback_action_record_call: Result: " + str(future.result()))
-        response = (future.result())['Response']
-        if(response == 'Success'):
-            self.log.info("Events::callback_action_record_call: Record save with sucess")
-
-            self.save_cc_name(file_name, call_id, target, targets)             
+        try:
+            response = (future.result())['Response']
+            if(response == 'Success'):
+                self.log.info("Events::callback_action_record_call: Record save with sucess")
+                self.save_cc_name(file_name, call_id, target, targets) 
+        except Exception as error:
+            self.log.error("Events::callback_action_record_call: Error: " + str(error))
+                    
         return
             
     
@@ -77,7 +80,8 @@ class Events(Ami):
                         path_file = join(Record.PATH.value,file_name + Record.FORMAT.value)
                         self.log.info("Events::start_record_call: Trying record call with name file " + str(path_file))
                         future = manager.send_action({'Action': 'MixMonitor', 'Channel': channel, 'File': path_file})
-                        future.add_done_callback(partial(self.callback_action_record_call, call_id, file_name, target, targets))
+                        parameters = partial(self.callback_action_record_call, call_id, file_name, target, targets)
+                        future.add_done_callback(parameters)
                 return
         
         except Exception as error:
@@ -113,9 +117,9 @@ class Events(Ami):
         self.register_event('DialEnd',callback)
 
     def save_cc_name(self, cc, call_id, target, targets):
-        self.log.info("Events::save_cc_name: Trying save file " + cc + " with call id " + call_id + " and uri " + uri)
+        self.log.info("Events::save_cc_name: Trying save file " + cc + " with call id " + call_id + " and target " + str(target))
         interceptions_ids = []
-        for item in self.targets:
+        for item in targets:
             if(item[1] == target):
                 interceptions_ids.append(item[0])
 
@@ -123,8 +127,8 @@ class Events(Ami):
         self.database.connect()
         for interception_id in interceptions_ids:
             query = "INSERT INTO cc VALUES(?,?,?,?)"
-            values = [None,name_file,call_id,interception_id]
-            (cursor,conn) = self.execute_query(query,values)
+            values = [None,cc,interception_id,call_id]
+            (cursor,conn) = self.database.execute_query(query,values)
             conn.commit()
         self.database.disconnect()
 

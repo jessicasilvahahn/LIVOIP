@@ -8,7 +8,7 @@ start() {
   
 stop() {
   echo 'Trying stoping service!'
-  kill $(cat /var/run/server.pid)
+  kill -9 $(cat /var/run/server.pid)
 }
 
 restart() {
