@@ -22,6 +22,7 @@ CREATE TABLE uri(
 CREATE TABLE iri(
    id INTEGER PRIMARY KEY,
    iri VARCHAR(500) NOT NULL,
+   proxy VARCHAR(500),
    interception_id INTEGER NOT NULL,
    call_id VARCHAR(100) NOT NULL,
    FOREIGN KEY (interception_id) REFERENCES interception(id)

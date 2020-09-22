@@ -23,7 +23,7 @@ class Iri(Sniffer):
         self.socket = None
         self.reader = None
         self.sleep = sleep
-        self.database = Database(db_name=db_name,log=log)
+        self.database = Database(db_name,log)
     
     def start_sniffer(self):
         #depois passar id pra outras classes
@@ -31,36 +31,47 @@ class Iri(Sniffer):
         self.setup()
         super().start()
 
-    def save_iri_file(self, iri, call_id, interceptions_ids):
-        self.log.info("Iri::save_files: Trying save file: " + name_file + " call id " + call_id + " ids " + str(interceptions_ids) + " in the database")
-        self.database.connect()
-        for interception_id in interceptions_ids:
-            query = "INSERT INTO iri VALUES(?,?,?,?)"
-            values = [None,name_file,call_id,interception_id]
-            (cursor,conn) = self.execute_query(query,values)
-            conn.commit()
-        self.database.disconnect()
+    def save_iri_file(self, iri, call_id, interceptions_ids, proxy=False):
+        self.log.info("Iri::save_files: Trying save file: " + iri + " call id " + call_id + " ids " + str(interceptions_ids) + " in the database")
+        try:
+            self.database.connect()
+            for interception_id in interceptions_ids:
+                if(not proxy):
+                    query = "INSERT INTO iri VALUES(?,?,?,?,?)"
+                    values = [None, iri, None, interception_id, call_id]
+                else:
+                    query = "UPDATE iri SET proxy=\'" + iri + "\' where interception_id=" + str(interception_id)
+                    values = None
+                self.log.info("Iri::save_files: query :" + str(query)) 
+                (cursor,conn) = self.database.execute_query(query,values)
+                conn.commit()
+            self.database.disconnect()
+        except Exception as error:
+            self.log.error(str(error))
+        
+        return
 
     def write_pcap(self, packets):
         self.log.info("Iri::write_pcap")
         self.log.info("Iri::write_pcap: Packets: " + str(packets))
         self.log.info("Iri::write_pcap: proxy: " + str((packets['proxy'])))
-        name_pcap_without_ext = None
         call_id = ((((packets['Call-ID']).strip())[0:20]).replace("\r","")).replace(" ","")
         name_pcap = interception.get_iri_name(packets['URI'])
-        name_pcap_without_ext = name_pcap
+        new_path = None
+        proxy = False
+        interceptions_id = packets['interceptions_id']
         if(packets['proxy']):
             name_pcap = name_pcap + ".pcap.B"
+            proxy = True
         else:
             name_pcap = name_pcap + ".pcap"
        
-        name_pcap = join(self.path, name_pcap)
+        new_path = join(self.path, name_pcap)
         packet_list = packets['packets']
         self.log.info("Iri::write_pcap: Trying save pcap: " + name_pcap)
-        wrpcap(name_pcap, packet_list, append=True)
-        self.log.info("Iri::write_pcap: Pcap: " + name_pcap + " is terminated")
-
-        self.save_iri_file(call_id, name_pcap_without_ext, packets['interceptions_id'])
+        wrpcap(new_path, packet_list, append=True)
+        self.log.info("Iri::write_pcap: Pcap: " + new_path + " is terminated")
+        self.save_iri_file(name_pcap, call_id, interceptions_id, proxy)
         return
 
     

@@ -44,8 +44,8 @@ class Asterisk(Database):
 
     def setup(self):
         self.log.info("Asterisk::setup: Trying create iri client: host " + str(self.__iri_host) + " port " + str(self.__iri_port))
-        self.client_iri = Client(self.__iri_host, self.__iri_port, self.db_name, self.log)
-        self.client_cc = Client(self.__cc_host, self.__cc_port, self.db_name, self.log)
+        self.client_iri = Client(self.__iri_host, self.__iri_port, self.log)
+        self.client_cc = Client(self.__cc_host, self.__cc_port, self.log)
 
     def stop(self):
         self.log.info("Asterisk::setup: Trying stop service")
