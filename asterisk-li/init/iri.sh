@@ -9,6 +9,7 @@ start() {
 stop() {
   echo 'Trying stoping service!'
   kill -9 $(cat /var/run/iri.pid)
+  rm /var/run/iri.pid
 }
 
 restart() {

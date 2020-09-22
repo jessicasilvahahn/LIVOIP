@@ -9,6 +9,7 @@ start() {
 stop() {
   echo 'Trying stoping service!'
   kill -9 $(cat /var/run/cc.pid)
+  rm /var/run/cc.pid
 }
 
 restart() {
