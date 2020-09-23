@@ -24,6 +24,7 @@ from heapq import merge
 import subprocess
 import json
 from library.sftp.sftp import Sftp
+from modules.asterisk.events.asterisk import Record
 
 class Evidences():
     def __init__(self, iri:dict, cc:dict, email:dict, host:str, log, database, path:str):
@@ -70,6 +71,7 @@ class Evidences():
             url = GET_PCAP.format(host) + "?file=" + str(iri_name)
             (code, json, response) = self.iri_client.http_request(Method.GET,url,True,None)
             self.log.info("Evidences::get_iri: Status code: " + str(code))
+            self.log.info("Evidences::get_iri: Response: " + str(response))
             if(code == 200):
                 self.log.info("Evidences::get_iri: Trying save file: " + str(iri_name))
                 new_path = join(new_path_iri,iri_name)
@@ -83,7 +85,7 @@ class Evidences():
                 pcap_b = new_path
                 state = self.get_iri_proxy(proxy_name,new_path)
                 if(state):
-                    state = self.join_pcap(pcap_a, pcap_b, new_path)
+                    state = self.join_pcap(pcap_a, pcap_b, pcap_a)
         
         self.log.info("Evidences::get_iri: state: " + str(state))
         return (state,iri_name)
@@ -135,15 +137,17 @@ class Evidences():
         self.log.info("Evidences::get_file_name")
         file_name = None
         data = json.dumps({"call_id":call_id, "interception_id":interception_id})
-        url = GET_CC.format(self.cc_client.server_parameters['host'] + ':' + self.cc_client.server_parameters['port'])
+        url = GET_CC.format(self.cc_client.server_parameters['host'] + ':' + self.iri_client.server_parameters['port'])
         client = self.cc_client
         if(type_file == 'iri'):
             url = GET_IRI.format(self.iri_client.server_parameters['host'] + ':' + self.iri_client.server_parameters['port'])
             client = self.iri_client
 
         (code, response_json, response) = client.http_request(Method.POST,url,False,{'Content-Type':'application/json'},data)
+        self.log.debug("Evidences::get_file_name: code response: " + str(code))
         if(code == 200):
-            file_name = json.loads(response_json)
+            self.log.debug("Evidences::get_file_name: response_json: " + str(response_json))
+            file_name = response_json
             self.log.info("Evidences::get_file_name: file: " + str(file_name))
 
         return file_name
@@ -154,14 +158,16 @@ class Evidences():
         cc_name = None
         self.log.info("Evidences::get_cc: call_id: " + str(call_id) + " interception_id: " + interception_id)
         cc_name = self.get_file_name(call_id,interception_id,"cc")
-        cc_name = cc_name["file"]
+        self.log.debug("Evidences::get_cc: cc name: " + str(cc_name))
         if(cc_name):
+            cc_name = cc_name["file"] + Record.FORMAT.value
             host = self.cc_client.server_parameters['host'] + ':' + self.cc_client.server_parameters['port']
             self.log.info("Evidences::get_cc: host: " + str(host))
             url = GET_RECORD.format(host,cc_name)
             self.log.info("Evidences::get_cc: url: " + str(url))
             (code, json, response) = self.cc_client.http_request(Method.GET,url,True,None)
             self.log.info("Evidences::get_cc: Status code: " + str(code))
+            self.log.info("Evidences::get_cc: Response: " + str(response))
             if(code == 200):
                 new_path = join(new_path_cc,cc_name)
                 self.log.info("Evidences::get_cc: Trying save file: " + str(new_path))
@@ -194,8 +200,9 @@ class Evidences():
                 
             if(targets):
                 for cpf,id,cdr_id in targets:
+                    self.log.debug("Evidences::get_targets: " + str(cpf) + str(id) + str(cdr_id))
                     if(not id in self.alerted_targets):
-                        
+
                         self.alerted_targets.append(int(id))
                         self.log.info("Evidences::get_targets: alerted_targets: " + str(self.alerted_targets))
                         query = "SELECT id,oficio from li where target_id=\'" + str(cpf) + "\' and flag=\'A\'"
@@ -320,20 +327,22 @@ class Evidences():
         state = True
         uri = None
         self.database.connect()
-        query = "SELECT uri from target where cpf=" + cpf
+        query = "SELECT uri from target where cpf=\'" + cpf + '\''
         (cursor,conn) = self.database.execute_query(query)
         uri = cursor.fetchone()
         self.database.disconnect()
         uri = uri[0]
         if(ip and path and port):
             sftp_session = Sftp(self.log,ip,int(port),user,password)
-            remote_path = join(path,str(uri))
             sftp_session.setup()
             sftp_session.connect()
-            sftp_session.create_remote_dir(remote_path)
+            sftp_session.create_remote_dir(uri)
+            remote_path = join(path,str(uri))
             iri = join(self.path_iri + '/' + cpf, iri)
+            self.log.info("Evidences::sftp: iri: " + str(iri))
             sftp_session.send_file(iri,remote_path)
             cc = join(self.path_cc + '/' + cpf, cc)
+            self.log.info("Evidences::sftp: cc: " + str(cc))
             sftp_session.send_file(cc,remote_path)
             sftp_session.close()
 

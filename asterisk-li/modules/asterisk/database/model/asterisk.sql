@@ -53,3 +53,8 @@ VALUES(NULL,'48991093349','79799452040');
 
 INSERT INTO uri (id,uri,cpf)
 VALUES(NULL,'jessica','08974676982');
+
+INSERT INTO iri (id,iri,proxy,interception_id,call_id)
+VALUES(NULL,'48988163769-20200922023734-sip.pcap','48988163769-20200922023738-sip.pcap.B',1,'mBnmx7wN6m');
+
+

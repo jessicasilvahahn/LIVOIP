@@ -44,14 +44,14 @@ class Handler(BaseHTTPRequestHandler):
         result = None
         proxy = False
         
-        query = "SELECT " + str(table) + " from " + str(table) + " where call_id=" + str(call_id) + " and interception_id=" + interception_id
+        query = "SELECT " + str(table) + " from " + str(table) + " where call_id=\'" + str(call_id) + "\' and interception_id=" + interception_id
 
         if(table == "iri"):
             proxy = True
-            query = "SELECT " + str(table) + ",proxy from " + str(table) + " where call_id=" + str(call_id) + " and interception_id=" + interception_id
+            query = "SELECT " + str(table) + ",proxy from " + str(table) + " where call_id=\'" + str(call_id) + "\' and interception_id=" + interception_id
 
         database.connect()
-        (cursor,conn) = self.database.execute_query(query)
+        (cursor,conn) = database.execute_query(query)
         if(cursor):
             result = cursor.fetchone()
             if(result):
@@ -103,13 +103,13 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write('You are not authorized to enter this application!'.encode('utf-8'))
                 return
             parsed_path = (parse.urlparse(self.path)).path
-            self.log.debug("Server::do_GET: " + str(parsed_path))
             if(parsed_path == pcap.uri):
-                parameters = parse_qs(parse(self.path).query)
+                parameters = parse_qs(parse.urlparse(self.path).query)
                 self.log.debug("Server::do_GET: parameters" + str(parameters))
-                name_file = join(pcap.path,parameters["file"])
+                name_file = join(pcap.path,(parameters["file"])[0])
+                self.log.debug("Server::do_GET: file path" + str(name_file))
                 if(exists(name_file)):
-                    self.HEADER(name_file)
+                    self.HEADER((parameters["file"])[0])
                     with open(name_file, 'rb') as reader:
                         bytes_line = reader.read()
                         while(bytes_line):
