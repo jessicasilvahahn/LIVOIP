@@ -66,6 +66,7 @@ class Evidences():
         iri_name = self.get_file_name(call_id,interception_id,"iri")
         proxy_name = iri_name['proxy']
         iri_name = iri_name['file']
+        new_pcap = None
         if(iri_name):
             host = self.iri_client.server_parameters['host'] + ':' + self.iri_client.server_parameters['port']
             url = GET_PCAP.format(host) + "?file=" + str(iri_name)
@@ -74,7 +75,7 @@ class Evidences():
             self.log.info("Evidences::get_iri: Response: " + str(response))
             if(code == 200):
                 self.log.info("Evidences::get_iri: Trying save file: " + str(iri_name))
-                new_path = join(new_path_iri,iri_name)
+                new_path = join(new_path_iri,iri_name + '.A')
                 pcap_a = new_path
                 file = open(pcap_a, 'wb')
                 for chunk in response.iter_content(self.iri_buffer):
@@ -85,7 +86,8 @@ class Evidences():
                 pcap_b = new_path
                 state = self.get_iri_proxy(proxy_name,new_path)
                 if(state):
-                    state = self.join_pcap(pcap_a, pcap_b, pcap_a)
+                    new_pcap = join(new_path_iri,iri_name)
+                    state = self.join_pcap(pcap_a, pcap_b, new_pcap)
         
         self.log.info("Evidences::get_iri: state: " + str(state))
         return (state,iri_name)
@@ -255,7 +257,11 @@ class Evidences():
                     self.log.debug("Evidences::get_evidences: states: " + str(state_iri) + ' ' + str(state_cc))
                     if(state_iri and state_cc):
                         self.log.debug("Evidences::get_evidences: evidences (iri and cc) founded!")
-                        self.alert_lea(lea,cdr_targets_id,cpf,iri_name,cc_name)
+                        if(self.alert_lea(lea,cpf,iri_name,cc_name)):
+                            self.change_state(int(cdr_targets_id))
+                            continue
+
+                        self.alerted_targets.remove(cdr_targets_id)
                     else:
                         self.alerted_targets.remove(cdr_targets_id)
                         self.log.warning("Evidences::get_evidences: evidences (iri and cc) not found")
@@ -326,6 +332,7 @@ class Evidences():
         sftp_session = None
         state = True
         uri = None
+        new_name = None
         self.database.connect()
         query = "SELECT uri from target where cpf=\'" + cpf + '\''
         (cursor,conn) = self.database.execute_query(query)
@@ -335,15 +342,21 @@ class Evidences():
         if(ip and path and port):
             sftp_session = Sftp(self.log,ip,int(port),user,password)
             sftp_session.setup()
-            sftp_session.connect()
-            sftp_session.create_remote_dir(uri)
+            state = sftp_session.connect()
             remote_path = join(path,str(uri))
+            new_name = join(remote_path,iri)
+            if(not sftp_session.remote_dir_exists(path,str(uri))):
+                state = sftp_session.create_remote_dir(remote_path)
+                
             iri = join(self.path_iri + '/' + cpf, iri)
-            self.log.info("Evidences::sftp: iri: " + str(iri))
-            sftp_session.send_file(iri,remote_path)
+            self.log.info("Evidences::sftp: src iri: " + str(iri))
+            self.log.info("Evidences::sftp: dest iri: " + str(new_name))
+            state = sftp_session.send_file(iri,new_name)
+            new_name = join(remote_path,cc)
             cc = join(self.path_cc + '/' + cpf, cc)
-            self.log.info("Evidences::sftp: cc: " + str(cc))
-            sftp_session.send_file(cc,remote_path)
+            self.log.info("Evidences::sftp: src cc: " + str(cc))
+            self.log.info("Evidences::sftp: dest cc: " + str(new_name))
+            state = sftp_session.send_file(cc,new_name)
             sftp_session.close()
 
         else:
@@ -351,14 +364,15 @@ class Evidences():
             if(not state):
                 uri = None
         
-        return uri
+        return (uri,state)
 
-    def alert_lea(self,lea,cdr_targets_id,cpf,iri_name,cc_name):
+    def alert_lea(self,lea,cpf,iri_name,cc_name):
         self.log.info("Evidences::alert_lea")
         ip = None
         port = None
         path = None
         uri = None
+        state = True
         try:
             self.database.connect()
             query = "SELECT user,password,email,ip,port,path_sftp from lea where id=" + str(lea)
@@ -373,21 +387,21 @@ class Evidences():
                 ip = result[3]
                 port = result[4]
                 path = result[5]
-                uri = self.sftp(lea,cpf,user,password,ip,port,path,iri_name,cc_name)
+                (uri,state) = self.sftp(lea,cpf,user,password,ip,port,path,iri_name,cc_name)
                 self.log.info("Evidences::alert_lea: Lea: " + str(email))
-                if(uri):
+                if(uri and state):
                     host = self.host.split(':')
                     self.host = host[0]         
                     content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + uri + "<p><br> <p> Pcap: " + str(iri_name) + "<p> <br> <p>Audio: " + str(cc_name) + "<p> <br> Para ter acesso a essas evidencias acesse o servidor " + str(self.host) + " por sftp na porta " + str(port)
                     subject = "[Investigacao] ALERT: Novas evidencias do alvo " + str(uri)
                     self.log.info("Evidences::alert_lea: Content: " + str(content) + " ,subject: " + str(subject))
                     self.email.send(email,subject,content)
-                    self.change_state(int(cdr_targets_id))
+                    return True
+                    
 
         except Exception as error:
             self.log.error("Evidences::alert_lea: Error: " + str(error))
-       
-        return
+            return False
 
     def change_state(self,cdr_targets_id:int):
         self.log.info("Evidences::change_state")

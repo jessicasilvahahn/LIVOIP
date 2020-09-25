@@ -25,30 +25,44 @@ class Sftp():
         try:
             self.transport.connect(username=self.user, password=self.password)
             self.sftp = paramiko.SFTPClient.from_transport(self.transport)
+            return True
         except Exception as error:
             self.log.error("Sftp::connect: Error: " + str(error))
+            return False
         
 
     def send_file(self, src, dest):
-        self.log.info("Sftp::send_file: Trying send file " + src + "to " + dest)
+        self.log.info("Sftp::send_file: Trying send file " + src + " to " + dest)
         try:
             self.sftp.put(src, dest)
+            return True
         except Exception as error:
             self.log.error("Sftp::send_file: Error: " + str(error))
-       
+            return False
+    
+    def remote_dir_exists(self, remote_path, new_dir):
+        self.log.info("Sftp::remote_dir_exists: " + str(remote_path) + ", " + str(new_dir))
+        remote_dirs = self.sftp.listdir(remote_path)
+        self.log.debug("Sftp::remote_dir_exists: remote dirs: " + str(remote_dirs))
+        if new_dir in remote_dirs:
+            return True
+        
+        return False
+    
     def create_remote_dir(self, dir):
         self.log.info("Sftp::create_remote_dir: Trying create remote dir " + dir)
         try:
-            self.sftp.chdir(dir)
-        except IOError:
+            self.log.debug("Sftp::create_remote_dir: The directory " + str(dir) + " not exists!")
             self.sftp.mkdir(dir)
-            self.sftp.chdir(dir)
+            return True
+        except Exception as error:
+            self.log.error("Sftp::create_remote_dir: Error: " + str(error))
+            return False
     
     def close(self):
         self.log.info("Sftp::close")
         try:
             self.sftp.close()
-            self.sftp.transport.close()
         except Exception as error:
             self.log.error("Sftp::close: Error: " + str(error))
         
