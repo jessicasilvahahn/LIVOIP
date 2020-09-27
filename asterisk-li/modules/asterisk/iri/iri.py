@@ -31,17 +31,42 @@ class Iri(Sniffer):
         self.setup()
         super().start()
 
+    def file_iri_exists(self, call_id, interception_id):
+        self.log.info("file_iri_exists: call id: " + str(call_id) + " interception id: " + str(interception_id))
+        id = None
+        query = "SELECT id from iri where call_id=\'" + str(call_id) + "\' and interception_id=" + str(interception_id)
+        (cursor,conn) = self.database.execute_query(query)
+        id = cursor.fetchone()
+        self.log.info("file_iri_exists: id: " + str(id))
+        if(not id):
+            self.log.info("file_iri_exists: iri not exists: " + str(id))
+            return False
+        
+        return True
+
     def save_iri_file(self, iri, call_id, interceptions_ids, proxy=False):
         self.log.info("Iri::save_files: Trying save file: " + iri + " call id " + call_id + " ids " + str(interceptions_ids) + " in the database")
         try:
+            iri_exists = False
+            proxy = []
             self.database.connect()
             for interception_id in interceptions_ids:
+                iri_exists = self.file_iri_exists(call_id,interception_id)
                 if(not proxy):
-                    query = "INSERT INTO iri VALUES(?,?,?,?,?)"
-                    values = [None, iri, None, interception_id, call_id]
+                    if(not iri_exists):
+                        query = "INSERT INTO iri VALUES(?,?,?,?,?)"
+                        values = [None, iri, None, interception_id, call_id]
+                    else:
+                        query = "UPDATE iri SET iri=\'" + str(iri) + "\' where interception_id=" + str(interception_id) + " and call_id=\'" + str(call_id) + "\'"
+                        values = None
                 else:
-                    query = "UPDATE iri SET proxy=\'" + iri + "\' where interception_id=" + str(interception_id)
-                    values = None
+                    if(not iri_exists):
+                        query = "INSERT INTO iri VALUES(?,?,?,?,?)"
+                        values = [None, None, iri, interception_id, call_id]
+                    else:
+                        query = "UPDATE iri SET proxy=\'" + iri + "\' where interception_id=" + str(interception_id)
+                        values = None
+                
                 self.log.info("Iri::save_files: query :" + str(query)) 
                 (cursor,conn) = self.database.execute_query(query,values)
                 conn.commit()
@@ -61,6 +86,8 @@ class Iri(Sniffer):
         proxy = False
         interceptions_id = packets['interceptions_id']
         if(packets['proxy']):
+            call_id = ((((packets['proxy']).strip())[0:20]).replace("\r","")).replace(" ","")
+             self.log.info("Iri::write_pcap: call id proxy :" + str(call_id)) 
             name_pcap = name_pcap + ".pcap.B"
             proxy = True
         else:
