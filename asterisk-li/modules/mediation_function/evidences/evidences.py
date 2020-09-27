@@ -392,7 +392,7 @@ class Evidences():
                 if(uri and state):
                     host = self.host.split(':')
                     self.host = host[0]         
-                    content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + uri + "<p><br> <p> Pcap: " + str(iri_name) + "<p> <br> <p>Audio: " + str(cc_name) + "<p> <br> Para ter acesso a essas evidencias acesse o servidor " + str(self.host) + " por sftp na porta " + str(port)
+                    content = "<p>Prezado (a) Vossa Excelencia, foi constatado em nosso sistema que o investigado abaixo fez uma ligacao. </p> <br> <p> Alvo: " + uri + "<p><br> <p> Pcap: " + str(iri_name) + "<p> <br> <p>Audio: " + str(cc_name) + "<p> <br> Para ter acesso a essas evidencias acesse o servidor sftp cadastrado"
                     subject = "[Investigacao] ALERT: Novas evidencias do alvo " + str(uri)
                     self.log.info("Evidences::alert_lea: Content: " + str(content) + " ,subject: " + str(subject))
                     self.email.send(email,subject,content)

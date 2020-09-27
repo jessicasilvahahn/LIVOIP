@@ -1,0 +1,28 @@
+alvo: 5548988163769
+
+Cenario1
+
+alvo: faz a ligacao (SRC)
+sftp: localhost
+
+
+Cenario2:
+
+alvo: recebe a ligacao (Dest)
+sftp: outro container
+
+
+Cenario3:
+
+Alvo: rede IFSC
+sftp: através da criacao do usuario
+
+
+Cenario4:
+
+Remove a interceptacao do cenario anterior (Cenario3) e faz a ligacao novamente
+
+Cenario5:
+
+Alvo: destino
+Outro softphone faz a ligacao pro alvo
