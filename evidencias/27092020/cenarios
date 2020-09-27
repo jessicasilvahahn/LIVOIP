@@ -15,7 +15,7 @@ sftp: outro container
 Cenario3:
 
 Alvo: rede IFSC
-sftp: através da criacao do usuario
+sftp: outro container
 
 
 Cenario4:
@@ -26,3 +26,9 @@ Cenario5:
 
 Alvo: destino
 Outro softphone faz a ligacao pro alvo
+
+
+Cenario6:
+
+Alvo: rede IFSC
+sftp: através da criacao do usuario
