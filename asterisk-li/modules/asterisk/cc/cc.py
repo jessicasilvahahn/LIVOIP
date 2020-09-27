@@ -34,9 +34,7 @@ class Record(Events):
             self.log.info("Record::get_interceptions")
             interceptions = self.server.receive_msg()
             self.log.info("Record::get_interceptions: Uris from interceptions: " + str(interceptions))
-            if(interceptions):
-                self.interceptions.put(interceptions)
-
+            self.interceptions.put(interceptions)
             self.log.info("Record::get_interceptions: Sleeping ...")
             time.sleep(self.sleep)
 
