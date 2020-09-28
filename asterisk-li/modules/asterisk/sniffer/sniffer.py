@@ -89,13 +89,13 @@ class Sniffer():
             call_id = self.sip.get_call_id(packet_string)
             asterisk_call_id = self.sip.get_asterisk_call_id(packet_string)
             self.log.info("Sniffer::callback: Call-ID: " + str(call_id))
+            self.interception_list = self.interception_queue.get()
+            self.log.info("Sniffer::callback: interceptions " + str(self.interception_list))
             if(not call_id):
                 return
             if(message == Message.INVITE.value):
                 self.log.info("Sniffer::callback: INVITE")
                 (uri_from, uri_to) = self.sip.get_uris(packet_string)
-                self.interception_list = self.interception_queue.get()
-                self.log.info("Sniffer::callback: interceptions " + str(self.interception_list))
                 if(self.interception_list):
                     if(asterisk_call_id):
                         proxy = asterisk_call_id
