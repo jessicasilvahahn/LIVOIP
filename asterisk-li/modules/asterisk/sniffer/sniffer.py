@@ -78,7 +78,7 @@ class Sniffer():
         return
 
     def get_interceptions_list(self):
-        self.log.info("Sniffer::get_interceptions_list:" + str(self.interception_list))
+        self.log.info("Sniffer::get_interceptions_list: " + str(self.interception_list))
         interceptions_current = []
         interceptions_current = self.interception_list
         try:
@@ -106,7 +106,7 @@ class Sniffer():
                 return
             self.log.info("Sniffer::callback: message: " + str(message))
             self.get_interceptions_list()
-            self.log.info("Sniffer::callback: interceptions " + str(self.interception_list))
+            self.log.info("Sniffer::callback: interceptions: " + str(self.interception_list))
             if(message == Message.INVITE.value):
                 self.log.info("Sniffer::callback: INVITE")
                 (uri_from, uri_to) = self.sip.get_uris(packet_string)
@@ -149,6 +149,8 @@ class Sniffer():
                     
                     self.complete()
     
+        except Queue.Empty as warn:
+            self.log.info(str(warn))
         except Exception as error:
             self.log.error(str(error))
         
