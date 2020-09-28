@@ -79,7 +79,14 @@ class Sniffer():
 
     def get_interceptions_list(self):
         self.log.info("Sniffer::get_interceptions_list: " + str(self.interception_list))
-        self.interception_list = self.interception_queue.get(block=False)
+        interceptions_current = []
+        interceptions_current = self.interception_list
+        try:
+            self.interception_list = self.interception_queue.get(block=False)
+        
+        except Queue.Empty:
+            self.interception_list = interceptions_current
+
         return
         
 
@@ -88,7 +95,6 @@ class Sniffer():
         sip = {}
         proxy = None
         interceptions_id = []
-        interceptions_current = self.interception_list
         try:
             load = packet.load
             packet_string = load.decode()
@@ -143,11 +149,8 @@ class Sniffer():
                     
                     self.complete()
 
-        except Queue.Empty:
-            self.interception_list = interceptions_current
-            self.log.info("Sniffer::callback: queue is empty, current list: " + str(self.interception_list))
-        except Exception as error:
-            self.log.error("Sniffer::callback: " + str(error))
+        except Exception as warn:
+            self.log.warning("Sniffer::callback: " + str(warn))
         
         return
 
