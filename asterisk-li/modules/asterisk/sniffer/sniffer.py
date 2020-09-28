@@ -82,7 +82,7 @@ class Sniffer():
         interceptions_current = []
         interceptions_current = self.interception_list
         try:
-            self.interception_list = self.interception_queue.get(block=False)
+            self.interception_list = self.interception_queue.get(timeout=10)
         
         except Queue.Empty:
             self.interception_list = interceptions_current
