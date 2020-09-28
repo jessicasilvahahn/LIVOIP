@@ -132,8 +132,6 @@ class Iri(Sniffer):
             interceptions = self.server.receive_msg()
             self.log.info("Iri::get_interceptions: Uris from interceptions: " + str(interceptions))
             self.interception_queue.put(interceptions)
-            self.log.info("Iri::get_interceptions: Sleeping ...")
-            time.sleep(self.sleep)
 
     def start(self):
         self.log.info("Iri::start")
