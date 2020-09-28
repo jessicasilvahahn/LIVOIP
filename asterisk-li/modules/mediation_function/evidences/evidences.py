@@ -64,10 +64,10 @@ class Evidences():
         proxy_name = None
         self.log.info("Evidences::get_iri: call_id: " + str(call_id) + " interception_id: " + interception_id)
         iri_name = self.get_file_name(call_id,interception_id,"iri")
-        proxy_name = iri_name['proxy']
-        iri_name = iri_name['file']
         new_pcap = None
         if(iri_name):
+            proxy_name = iri_name['proxy']
+            iri_name = iri_name['file']
             host = self.iri_client.server_parameters['host'] + ':' + self.iri_client.server_parameters['port']
             url = GET_PCAP.format(host) + "?file=" + str(iri_name)
             (code, json, response) = self.iri_client.http_request(Method.GET,url,True,None)
