@@ -148,11 +148,8 @@ class Sniffer():
                         ((self.__sip_dict[call_id])['packets']).append(packet)
                     
                     self.complete()
-    
-        except Queue.Empty as warn:
-            self.log.info(str(warn))
         except Exception as error:
-            self.log.error(str(error))
+            self.log.error("Sniffer::callback: " + str(error))
         
         return
 
