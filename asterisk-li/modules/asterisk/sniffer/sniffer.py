@@ -6,9 +6,6 @@ from library.sip.sip import Message
 from queue import Queue
 from  itertools import chain
 
-class Empty(Exception):
-    pass
-
 class Sniffer():
     def __init__(self, interface, protocol, port, log):
         self.interface = interface
@@ -82,15 +79,7 @@ class Sniffer():
 
     def get_interceptions_list(self):
         self.log.info("Sniffer::get_interceptions_list: " + str(self.interception_list))
-        interceptions_current = []
-        interceptions_current = self.interception_list
-        try:
-            self.interception_list = self.interception_queue.get(block=False)
-        
-        except Queue.Empty:
-            self.interception_list = interceptions_current
-            raise Empty
-
+        self.interception_list = self.interception_queue.get(block=False)
         return
         
 
@@ -99,6 +88,7 @@ class Sniffer():
         sip = {}
         proxy = None
         interceptions_id = []
+        interceptions_current = self.interception_list
         try:
             load = packet.load
             packet_string = load.decode()
@@ -153,8 +143,9 @@ class Sniffer():
                     
                     self.complete()
 
-        except Empty:
-            self.log.info("Sniffer::callback: queue is empty")
+        except Queue.Empty:
+            self.interception_list = interceptions_current
+            self.log.info("Sniffer::callback: queue is empty, current list: " + str(self.interception_list))
         except Exception as error:
             self.log.error("Sniffer::callback: " + str(error))
         
