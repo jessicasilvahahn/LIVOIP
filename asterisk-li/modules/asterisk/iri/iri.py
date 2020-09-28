@@ -48,7 +48,6 @@ class Iri(Sniffer):
         self.log.info("Iri::save_files: Trying save file: " + iri + " call id " + call_id + " ids " + str(interceptions_ids) + " in the database")
         try:
             iri_exists = False
-            proxy = []
             self.database.connect()
             for interception_id in interceptions_ids:
                 iri_exists = self.file_iri_exists(call_id,interception_id)
