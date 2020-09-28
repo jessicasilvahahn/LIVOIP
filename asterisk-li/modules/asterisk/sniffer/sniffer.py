@@ -95,6 +95,8 @@ class Sniffer():
                 return
             self.log.info("Sniffer::callback: message: " + str(message))
             if(message == Message.INVITE.value):
+                self.interception_list = self.interception_queue.get()
+                self.log.info("Sniffer::callback: interceptions " + str(self.interception_list))
                 self.log.info("Sniffer::callback: INVITE")
                 (uri_from, uri_to) = self.sip.get_uris(packet_string)
                 if(self.interception_list):
