@@ -93,6 +93,7 @@ class Sniffer():
             self.log.info("Sniffer::callback: interceptions " + str(self.interception_list))
             if(not call_id):
                 return
+            self.log.info("Sniffer::callback: message: " + str(message))
             if(message == Message.INVITE.value):
                 self.log.info("Sniffer::callback: INVITE")
                 (uri_from, uri_to) = self.sip.get_uris(packet_string)
