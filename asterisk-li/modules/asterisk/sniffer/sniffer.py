@@ -77,6 +77,19 @@ class Sniffer():
 
         return
 
+    def get_interceptions(self):
+        self.log.info("Sniffer::get_interceptions:" + str(self.interception_list))
+        interceptions_current = []
+        interceptions_current = self.interception_list
+        try:
+            self.interception_list = self.interception_queue.get(block=False)
+        
+        except Queue.Empty:
+            self.interception_list = interceptions_current
+
+        return
+        
+
     def callback(self, packet):
         self.log.info("Sniffer::callback")
         sip = {}
@@ -92,9 +105,9 @@ class Sniffer():
             if(not call_id):
                 return
             self.log.info("Sniffer::callback: message: " + str(message))
+            self.get_interceptions()
+            self.log.info("Sniffer::callback: interceptions " + str(self.interception_list))
             if(message == Message.INVITE.value):
-                self.interception_list = self.interception_queue.get()
-                self.log.info("Sniffer::callback: interceptions " + str(self.interception_list))
                 self.log.info("Sniffer::callback: INVITE")
                 (uri_from, uri_to) = self.sip.get_uris(packet_string)
                 if(self.interception_list):
