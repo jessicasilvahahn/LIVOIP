@@ -87,7 +87,7 @@ class Iri(Sniffer):
         interceptions_id = packets['interceptions_id']
         if(packets['proxy']):
             call_id = ((((packets['proxy']).strip())[0:20]).replace("\r","")).replace(" ","")
-             self.log.info("Iri::write_pcap: call id proxy :" + str(call_id)) 
+            self.log.info("Iri::write_pcap: call id proxy :" + str(call_id)) 
             name_pcap = name_pcap + ".pcap.B"
             proxy = True
         else:
