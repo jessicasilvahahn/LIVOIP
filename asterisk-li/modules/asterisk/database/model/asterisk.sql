@@ -21,7 +21,7 @@ CREATE TABLE uri(
 
 CREATE TABLE iri(
    id INTEGER PRIMARY KEY,
-   iri VARCHAR(500) NOT NULL,
+   iri VARCHAR(500),
    proxy VARCHAR(500),
    interception_id INTEGER NOT NULL,
    call_id VARCHAR(100) NOT NULL,
