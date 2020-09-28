@@ -77,8 +77,8 @@ class Sniffer():
 
         return
 
-    def get_interceptions(self):
-        self.log.info("Sniffer::get_interceptions:" + str(self.interception_list))
+    def get_interceptions_list(self):
+        self.log.info("Sniffer::get_interceptions_list:" + str(self.interception_list))
         interceptions_current = []
         interceptions_current = self.interception_list
         try:
@@ -105,7 +105,7 @@ class Sniffer():
             if(not call_id):
                 return
             self.log.info("Sniffer::callback: message: " + str(message))
-            self.get_interceptions()
+            self.get_interceptions_list()
             self.log.info("Sniffer::callback: interceptions " + str(self.interception_list))
             if(message == Message.INVITE.value):
                 self.log.info("Sniffer::callback: INVITE")
