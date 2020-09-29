@@ -3,6 +3,7 @@ from scapy.all import sniff
 from library.sip.sip import Sip
 from library.sip.sip import Message
 from queue import Queue
+from queue import Empty
 from  itertools import chain
 
 class Sniffer():
@@ -85,7 +86,8 @@ class Sniffer():
         
         try:
             self.interception_list = self.interception_queue.get(block=False)
-        except queue.Empty:
+        except Empty:
+            self.log.debug("Sniffer::callback: queue empty")
             pass
 
         try:
