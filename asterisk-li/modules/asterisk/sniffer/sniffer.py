@@ -164,8 +164,5 @@ class Sniffer():
         self.sip = Sip(self.log)
 
     def start(self):
-        try:
-            self.log.info("Sniffer::start: Start Sniffer with interface " + self.interface + " and filter " + self.filter)
-            sniff(iface=self.interface,filter=self.filter, prn=self.callback)
-        except Exception as error:
-            self.log.error(str(error))
+        self.log.info("Sniffer::start: Start Sniffer with interface " + self.interface + " and filter " + self.filter)
+        sniff(iface=self.interface,filter=self.filter, prn=self.callback)
