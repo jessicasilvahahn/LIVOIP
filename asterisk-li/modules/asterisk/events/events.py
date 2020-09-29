@@ -10,15 +10,15 @@ from queue import Queue
 from  itertools import chain
 from library.interception import interception
 from library.database.database import Database
-
+from collections import deque
 
 class Events(Ami):
     """Communication with AMI Asterisk"""
-    def __init__(self, server:str, user:str, password:str, interceptions:Queue, db_name:str, log):
+    def __init__(self, server:str, user:str, password:str, db_name:str, log):
         super().__init__(server,user,password,log)
-        self.log = log
         #fila de itcs
-        self.interceptions = interceptions
+        self.interceptions = deque()
+        self.log = log
         self.targets_recording = []
         self.database = Database(db_name,log)
     
@@ -54,9 +54,9 @@ class Events(Ami):
             if(event):
                 self.log.info("Event: " + str(event) + "\n")
                 #lista de alvos vindos da fila
-                self.log.info("Events::start_record_call: queue:" + str(self.interceptions.empty()))
-                if(not self.interceptions.empty()):
-                    targets = self.interceptions.get()
+                self.log.debug("Events::start_record_call: queue: " + str(len(self.interceptions)))
+                if(len(self.interceptions) != 0):
+                    targets = self.interceptions.popleft()
                     self.log.info("Events::start_record_call: targets: " + str(targets))
                     target_id_source = event['CallerIDNum']
                     target_id_destination = event['DestCallerIDNum']
