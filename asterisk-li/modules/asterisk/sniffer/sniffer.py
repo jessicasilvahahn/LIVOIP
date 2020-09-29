@@ -79,7 +79,6 @@ class Sniffer():
     def get_interceptions_list(self):
         self.log.info("Sniffer::get_interceptions_list: " + str(self.interception_list))
         self.interception_list = self.interception_queue.get(block=False)
-        return
         
 
     def callback(self, packet):
@@ -92,11 +91,9 @@ class Sniffer():
         try:
             self.get_interceptions_list()
         except Queue.Empty:
-            self.log.info("Sniffer::callback: queue is empty")
-            self.interception_list = interceptions_current
             pass
 
-        
+        self.log.debug("Sniffer::callback: pass")
         try:
             load = packet.load
             packet_string = load.decode()
