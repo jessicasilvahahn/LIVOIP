@@ -161,11 +161,17 @@ class Sniffer():
             self.filter = str(self.protocol) + " and port " + str(self.port)
         self.sip = Sip(self.log)
 
+    def sniffer(self):
+        self.log.info("Sniffer::sniffer: Start Sniffer with interface " + self.interface + " and filter " + self.filter)
+        sniff(iface=self.interface,filter=self.filter, prn=self.callback)
+        
     def start(self):
         try:
             get_interceptions_thread = threading.Thread(target=self.get_interceptions_list)
             get_interceptions_thread.start()
-            self.log.info("Sniffer::start: Start Sniffer with interface " + self.interface + " and filter " + self.filter)
-            sniff(iface=self.interface,filter=self.filter, prn=self.callback)
+            
+            sniiffer_thread = threading.Thread(target=self.sniffer)
+            sniiffer_thread.start()
+            
         except Exception as error:
             self.log.error(str(error))
