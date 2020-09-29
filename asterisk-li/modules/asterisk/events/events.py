@@ -54,6 +54,7 @@ class Events(Ami):
             if(event):
                 self.log.info("Event: " + str(event) + "\n")
                 #lista de alvos vindos da fila
+                self.log.info("Events::start_record_call: queue:" + str(self.interceptions.empty()))
                 if(not self.interceptions.empty()):
                     targets = self.interceptions.get()
                     self.log.info("Events::start_record_call: targets: " + str(targets))
