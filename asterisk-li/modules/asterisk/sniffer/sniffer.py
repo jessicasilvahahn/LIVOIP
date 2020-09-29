@@ -78,17 +78,23 @@ class Sniffer():
         return
 
     def get_interceptions_list(self):
-        self.log.info("Sniffer::get_interceptions_list: " + str(self.interception_list))
-        self.interception_list = self.interception_queue.get(block=False)
-        return
-         
+        while(True):
+            self.log.info("Sniffer::get_interceptions_list: " + str(self.interception_list))
+            interceptions_current = []
+            interceptions_current = self.interception_list
+            try:
+                self.interception_list = self.interception_queue.get(block=False)
+            
+            except Queue.Empty:
+                self.interception_list = interceptions_current
+            continue
+        
 
     def callback(self, packet):
         self.log.info("Sniffer::callback")
         sip = {}
         proxy = None
         interceptions_id = []
-        interceptions_current = self.interception_list
         try:
             load = packet.load
             packet_string = load.decode()
@@ -99,7 +105,6 @@ class Sniffer():
             if(not call_id):
                 return
             self.log.info("Sniffer::callback: message: " + str(message))
-            self.get_interceptions_list()
             self.log.info("Sniffer::callback: interceptions: " + str(self.interception_list))
             if(message == Message.INVITE.value):
                 self.log.info("Sniffer::callback: INVITE")
@@ -143,14 +148,11 @@ class Sniffer():
                     
                     self.complete()
 
-        except Queue.Empty:
-            self.interception_list = interceptions_current
-            continue
-
-        except Exception as warn:
-            self.log.warning("Sniffer::callback: " + str(warn))
-            continue
+        except Exception as error:
+            self.log.error("Sniffer::callback: " + str(error))
         
+        return
+
     def setup(self):
         self.log.info("Sniffer::setup")
         if(self.protocol == 'both'):
@@ -161,6 +163,8 @@ class Sniffer():
 
     def start(self):
         try:
+            get_interceptions_thread = threading.Thread(target=self.get_interceptions_list)
+            get_interceptions_thread.start()
             self.log.info("Sniffer::start: Start Sniffer with interface " + self.interface + " and filter " + self.filter)
             sniff(iface=self.interface,filter=self.filter, prn=self.callback)
         except Exception as error:
