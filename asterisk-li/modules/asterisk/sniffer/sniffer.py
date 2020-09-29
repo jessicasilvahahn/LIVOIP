@@ -1,6 +1,5 @@
 #!/opt/li-asterisk/tools/Python-3.6.7
 from scapy.all import sniff
-import threading
 from library.sip.sip import Sip
 from library.sip.sip import Message
 from queue import Queue
@@ -78,16 +77,18 @@ class Sniffer():
         return
 
     def get_interceptions_list(self):
-        while(True):
-            self.log.info("Sniffer::get_interceptions_list: " + str(self.interception_list))
-            interceptions_current = []
-            interceptions_current = self.interception_list
-            try:
-                self.interception_list = self.interception_queue.get(block=False)
+        self.log.info("Sniffer::get_interceptions_list: " + str(self.interception_list))
+        interceptions_current = []
+        interceptions_current = self.interception_list
+        try:
+            self.interception_list = self.interception_queue.get(block=False)
             
-            except Queue.Empty:
-                self.interception_list = interceptions_current
-            continue
+        except Queue.Empty:
+            self.log.info("Sniffer::get_interceptions_list: queue is empty")
+            self.interception_list = interceptions_current
+            pass
+    
+        return
         
 
     def callback(self, packet):
@@ -105,6 +106,7 @@ class Sniffer():
             if(not call_id):
                 return
             self.log.info("Sniffer::callback: message: " + str(message))
+            self.get_interceptions_list()
             self.log.info("Sniffer::callback: interceptions: " + str(self.interception_list))
             if(message == Message.INVITE.value):
                 self.log.info("Sniffer::callback: INVITE")
@@ -161,17 +163,9 @@ class Sniffer():
             self.filter = str(self.protocol) + " and port " + str(self.port)
         self.sip = Sip(self.log)
 
-    def sniffer(self):
-        self.log.info("Sniffer::sniffer: Start Sniffer with interface " + self.interface + " and filter " + self.filter)
-        sniff(iface=self.interface,filter=self.filter, prn=self.callback)
-        
     def start(self):
         try:
-            get_interceptions_thread = threading.Thread(target=self.get_interceptions_list)
-            get_interceptions_thread.start()
-            
-            sniiffer_thread = threading.Thread(target=self.sniffer)
-            sniiffer_thread.start()
-            
+            self.log.info("Sniffer::start: Start Sniffer with interface " + self.interface + " and filter " + self.filter)
+            sniff(iface=self.interface,filter=self.filter, prn=self.callback)
         except Exception as error:
             self.log.error(str(error))
