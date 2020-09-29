@@ -96,6 +96,7 @@ class Sniffer():
         sip = {}
         proxy = None
         interceptions_id = []
+        self.get_interceptions_list()
         try:
             load = packet.load
             packet_string = load.decode()
@@ -106,7 +107,6 @@ class Sniffer():
             if(not call_id):
                 return
             self.log.info("Sniffer::callback: message: " + str(message))
-            self.get_interceptions_list()
             self.log.info("Sniffer::callback: interceptions: " + str(self.interception_list))
             if(message == Message.INVITE.value):
                 self.log.info("Sniffer::callback: INVITE")
