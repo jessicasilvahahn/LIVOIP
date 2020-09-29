@@ -79,22 +79,16 @@ class Sniffer():
 
     def get_interceptions_list(self):
         self.log.info("Sniffer::get_interceptions_list: " + str(self.interception_list))
-        interceptions_current = []
-        interceptions_current = self.interception_list
-        try:
-            self.interception_list = self.interception_queue.get(timeout=10)
-        
-        except Queue.Empty:
-            self.interception_list = interceptions_current
-
+        self.interception_list = self.interception_queue.get(block=False)
         return
-        
+         
 
     def callback(self, packet):
         self.log.info("Sniffer::callback")
         sip = {}
         proxy = None
         interceptions_id = []
+        interceptions_current = self.interception_list
         try:
             load = packet.load
             packet_string = load.decode()
@@ -149,11 +143,14 @@ class Sniffer():
                     
                     self.complete()
 
+        except Queue.Empty:
+            self.interception_list = interceptions_current
+            continue
+
         except Exception as warn:
             self.log.warning("Sniffer::callback: " + str(warn))
+            continue
         
-        return
-
     def setup(self):
         self.log.info("Sniffer::setup")
         if(self.protocol == 'both'):
