@@ -111,10 +111,14 @@ class Events(Ami):
         callback = partial(self.stop_record_call)
         self.register_event('Hangup',callback)
 
+    def call_back_qualify(self, manager, event):
+        self.log.info("Events::call_back_qualify: event: " + str(event))
+
     def event_start_call(self):
         self.log.info("Events::event_start_call")
         callback = self.start_record_call
         self.register_event('DialEnd',callback)
+        self.register_event('SIPQualifyPeerDone', self.call_back_qualify)
 
     def save_cc_name(self, cc, call_id, target, targets):
         self.log.info("Events::save_cc_name: Trying save file " + cc + " with call id " + call_id + " and target " + str(target))
