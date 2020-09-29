@@ -194,6 +194,10 @@ class Handler(BaseHTTPRequestHandler):
                     call_id = json.loads(body.decode())["call_id"]
                     interception_id = json.loads(body.decode())["interception_id"]
                     file = self.get_files("iri", interception_id, call_id)
+                    iri_exists = file["file"]
+                    proxy_exists = file["proxy"]
+                    if(not(iri_exists and proxy_exists)):
+                        file = None
                 
                 msg_json = self.format_json(file)
                 self.log.debug("Server::do_POST::GET_IRI: json" + str(msg_json))
@@ -210,6 +214,8 @@ class Handler(BaseHTTPRequestHandler):
                     call_id = json.loads(body.decode())["call_id"]
                     interception_id = json.loads(body.decode())["interception_id"]
                     file = self.get_files("cc", interception_id, call_id)
+                    if(not file["file"]):
+                        file = None
                 
                 msg_json = self.format_json(file)
                 self.log.debug("Server::do_POST::GET_CC: json" + str(msg_json))
