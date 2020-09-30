@@ -1,8 +1,0 @@
-2020-06-22 21:54:52,280 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
-2020-06-22 21:54:52,286 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
-2020-06-22 21:54:55,308 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
-2020-06-22 21:54:55,314 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
-2020-06-22 21:54:58,337 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
-2020-06-22 21:54:58,344 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
-2020-06-22 21:55:04,371 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap
-2020-06-22 21:55:04,377 DEBUG /opt/li-asterisk/logs/server_asterisk.log: Server::do_GET: /ari/recordings/stored/pcap

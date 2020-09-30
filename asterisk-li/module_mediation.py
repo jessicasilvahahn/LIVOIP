@@ -29,7 +29,6 @@ class System():
             self.parameters['host'],
             self.parameters['sleep'],
             self.parameters['db_name'],
-            self.parameters['mode'],
             self.parameters['path'],
             self.log)
 
@@ -95,7 +94,6 @@ class System():
                         'cc': cc,
                         'email': email,
                         'ami': ami,
-                        'mode': self.config.get('general','mode'),
                         'path': self.config.get('general','path')}
 
 

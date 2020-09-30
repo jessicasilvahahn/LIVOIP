@@ -1,0 +1,683 @@
+Wireshark SSL debug log 
+
+Wireshark version: 2.6.3 (Git v2.6.3 packaged as 2.6.3-1~ubuntu14.04.1)
+GnuTLS version:    2.12.23
+Libgcrypt version: 1.5.3
+
+
+dissect_ssl enter frame #4 (first time)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 299
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 294, ssl state 0x00
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 1 offset 5 length 290 bytes, remaining 299 
+Calculating hash with offset 5 294
+ssl_dissect_hnd_hello_common found CLIENT RANDOM -> state 0x01
+
+dissect_ssl enter frame #6 (first time)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 1318
+ssl_try_set_version found version 0x0303 -> state 0x11
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 66, ssl state 0x11
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 2 offset 5 length 62 bytes, remaining 71 
+ssl_try_set_version found version 0x0303 -> state 0x11
+Calculating hash with offset 5 66
+ssl_dissect_hnd_hello_common found SERVER RANDOM -> state 0x13
+ssl_set_cipher found CIPHER 0xC030 TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 -> state 0x17
+ssl_load_keyfile dtls/ssl.keylog_file is not configured!
+tls13_load_secret TLS version 0x303 is not 1.3
+tls13_load_secret TLS version 0x303 is not 1.3
+  record: offset = 71, reported_length_remaining = 1247
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 895, ssl state 0x17
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 11 offset 76 length 891 bytes, remaining 971 
+Calculating hash with offset 76 895
+lookup(KeyID)[20]:
+| 93 16 69 15 f2 59 0a ad 1b 2d 18 15 9f 16 c8 32 |..i..Y...-.....2|
+| 96 a1 1a 22                                     |..."            |
+ssl_find_private_key_by_pubkey: lookup result: (nil)
+  record: offset = 971, reported_length_remaining = 347
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 333, ssl state 0x17
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 12 offset 976 length 329 bytes, remaining 1309 
+Calculating hash with offset 976 333
+  record: offset = 1309, reported_length_remaining = 9
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 4, ssl state 0x17
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 14 offset 1314 length 0 bytes, remaining 1318 
+Calculating hash with offset 1314 4
+
+dissect_ssl enter frame #8 (first time)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 126
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 70, ssl state 0x17
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 16 offset 5 length 66 bytes, remaining 75 
+Calculating hash with offset 5 70
+ssl_load_keyfile dtls/ssl.keylog_file is not configured!
+ssl_generate_pre_master_secret: found SSL_HND_CLIENT_KEY_EXCHG, state 17
+ssl_restore_master_key can't find pre-master secret by Unencrypted pre-master secret
+ssl_restore_master_key can't find pre-master secret by Encrypted pre-master secret
+dissect_ssl3_handshake can't generate pre master secret
+  record: offset = 75, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+decrypt_ssl3_record: app_data len 1, ssl state 0x17
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+ssl_load_keyfile dtls/ssl.keylog_file is not configured!
+ssl_finalize_decryption state = 0x17
+ssl_restore_master_key can't restore master secret using an empty Session ID
+ssl_restore_master_key can't find master secret by Client Random
+  Cannot find master secret
+packet_from_server: is from server - FALSE
+ssl_change_cipher CLIENT
+  record: offset = 81, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 40, ssl state 0x17
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 210 offset 86 length 1315281 bytes, remaining 126 
+
+dissect_ssl enter frame #9 (first time)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 242
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 186, ssl state 0x17
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 4 offset 5 length 182 bytes, remaining 191 
+Calculating hash with offset 5 186
+ssl_save_master_key not saving empty (pre-)master secret for Session Ticket!
+  record: offset = 191, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+decrypt_ssl3_record: app_data len 1, ssl state 0x417
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+ssl_dissect_change_cipher_spec Not using Session resumption
+ssl_load_keyfile dtls/ssl.keylog_file is not configured!
+ssl_finalize_decryption state = 0x417
+ssl_restore_master_key can't restore master secret using an empty Session ID
+ssl_restore_master_key can't find master secret by Client Random
+  Cannot find master secret
+packet_from_server: is from server - TRUE
+ssl_change_cipher SERVER
+  record: offset = 197, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 40, ssl state 0x417
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 177 offset 202 length 5833526 bytes, remaining 242 
+
+dissect_ssl enter frame #10 (first time)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 229
+dissect_ssl3_record: content_type 23 Application Data
+decrypt_ssl3_record: app_data len 224, ssl state 0x417
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+
+dissect_ssl enter frame #11 (first time)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+decrypt_ssl3_record: app_data len 115, ssl state 0x417
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+
+dissect_ssl enter frame #12 (first time)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 63
+dissect_ssl3_record: content_type 23 Application Data
+decrypt_ssl3_record: app_data len 58, ssl state 0x417
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+
+dissect_ssl enter frame #4 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 299
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 1 offset 5 length 290 bytes, remaining 299 
+
+dissect_ssl enter frame #6 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 1318
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 2 offset 5 length 62 bytes, remaining 71 
+  record: offset = 71, reported_length_remaining = 1247
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 11 offset 76 length 891 bytes, remaining 971 
+  record: offset = 971, reported_length_remaining = 347
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 12 offset 976 length 329 bytes, remaining 1309 
+  record: offset = 1309, reported_length_remaining = 9
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 14 offset 1314 length 0 bytes, remaining 1318 
+
+dissect_ssl enter frame #8 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 126
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 16 offset 5 length 66 bytes, remaining 75 
+  record: offset = 75, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 81, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 210 offset 86 length 1315281 bytes, remaining 126 
+
+dissect_ssl enter frame #9 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 242
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 4 offset 5 length 182 bytes, remaining 191 
+  record: offset = 191, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 197, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 177 offset 202 length 5833526 bytes, remaining 242 
+
+dissect_ssl enter frame #10 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 229
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #11 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #12 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 63
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #4 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 299
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 1 offset 5 length 290 bytes, remaining 299 
+
+dissect_ssl enter frame #12 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 63
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #6 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 1318
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 2 offset 5 length 62 bytes, remaining 71 
+  record: offset = 71, reported_length_remaining = 1247
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 11 offset 76 length 891 bytes, remaining 971 
+  record: offset = 971, reported_length_remaining = 347
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 12 offset 976 length 329 bytes, remaining 1309 
+  record: offset = 1309, reported_length_remaining = 9
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 14 offset 1314 length 0 bytes, remaining 1318 
+
+dissect_ssl enter frame #8 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 126
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 16 offset 5 length 66 bytes, remaining 75 
+  record: offset = 75, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 81, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 210 offset 86 length 1315281 bytes, remaining 126 
+
+dissect_ssl enter frame #9 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 242
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 4 offset 5 length 182 bytes, remaining 191 
+  record: offset = 191, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 197, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 177 offset 202 length 5833526 bytes, remaining 242 
+
+dissect_ssl enter frame #10 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 229
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #11 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #12 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 63
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #4 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 299
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 1 offset 5 length 290 bytes, remaining 299 
+
+dissect_ssl enter frame #6 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 1318
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 2 offset 5 length 62 bytes, remaining 71 
+  record: offset = 71, reported_length_remaining = 1247
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 11 offset 76 length 891 bytes, remaining 971 
+  record: offset = 971, reported_length_remaining = 347
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 12 offset 976 length 329 bytes, remaining 1309 
+  record: offset = 1309, reported_length_remaining = 9
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 14 offset 1314 length 0 bytes, remaining 1318 
+
+dissect_ssl enter frame #8 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 126
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 16 offset 5 length 66 bytes, remaining 75 
+  record: offset = 75, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 81, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 210 offset 86 length 1315281 bytes, remaining 126 
+
+dissect_ssl enter frame #9 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 242
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 4 offset 5 length 182 bytes, remaining 191 
+  record: offset = 191, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 197, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 177 offset 202 length 5833526 bytes, remaining 242 
+
+dissect_ssl enter frame #10 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 229
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #11 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #12 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 63
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #4 (first time)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 299
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 294, ssl state 0x00
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 1 offset 5 length 290 bytes, remaining 299 
+Calculating hash with offset 5 294
+ssl_dissect_hnd_hello_common found CLIENT RANDOM -> state 0x01
+
+dissect_ssl enter frame #6 (first time)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 1318
+ssl_try_set_version found version 0x0303 -> state 0x11
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 66, ssl state 0x11
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 2 offset 5 length 62 bytes, remaining 71 
+ssl_try_set_version found version 0x0303 -> state 0x11
+Calculating hash with offset 5 66
+ssl_dissect_hnd_hello_common found SERVER RANDOM -> state 0x13
+ssl_set_cipher found CIPHER 0xC030 TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 -> state 0x17
+ssl_load_keyfile dtls/ssl.keylog_file is not configured!
+tls13_load_secret TLS version 0x303 is not 1.3
+tls13_load_secret TLS version 0x303 is not 1.3
+  record: offset = 71, reported_length_remaining = 1247
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 895, ssl state 0x17
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 11 offset 76 length 891 bytes, remaining 971 
+Calculating hash with offset 76 895
+lookup(KeyID)[20]:
+| 93 16 69 15 f2 59 0a ad 1b 2d 18 15 9f 16 c8 32 |..i..Y...-.....2|
+| 96 a1 1a 22                                     |..."            |
+ssl_find_private_key_by_pubkey: lookup result: (nil)
+  record: offset = 971, reported_length_remaining = 347
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 333, ssl state 0x17
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 12 offset 976 length 329 bytes, remaining 1309 
+Calculating hash with offset 976 333
+  record: offset = 1309, reported_length_remaining = 9
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 4, ssl state 0x17
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 14 offset 1314 length 0 bytes, remaining 1318 
+Calculating hash with offset 1314 4
+
+dissect_ssl enter frame #8 (first time)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 126
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 70, ssl state 0x17
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 16 offset 5 length 66 bytes, remaining 75 
+Calculating hash with offset 5 70
+ssl_load_keyfile dtls/ssl.keylog_file is not configured!
+ssl_generate_pre_master_secret: found SSL_HND_CLIENT_KEY_EXCHG, state 17
+ssl_restore_master_key can't find pre-master secret by Unencrypted pre-master secret
+ssl_restore_master_key can't find pre-master secret by Encrypted pre-master secret
+dissect_ssl3_handshake can't generate pre master secret
+  record: offset = 75, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+decrypt_ssl3_record: app_data len 1, ssl state 0x17
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+ssl_load_keyfile dtls/ssl.keylog_file is not configured!
+ssl_finalize_decryption state = 0x17
+ssl_restore_master_key can't restore master secret using an empty Session ID
+ssl_restore_master_key can't find master secret by Client Random
+  Cannot find master secret
+packet_from_server: is from server - FALSE
+ssl_change_cipher CLIENT
+  record: offset = 81, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 40, ssl state 0x17
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 14 offset 86 length 3461208 bytes, remaining 126 
+
+dissect_ssl enter frame #9 (first time)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 242
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 186, ssl state 0x17
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 4 offset 5 length 182 bytes, remaining 191 
+Calculating hash with offset 5 186
+ssl_save_master_key not saving empty (pre-)master secret for Session Ticket!
+  record: offset = 191, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+decrypt_ssl3_record: app_data len 1, ssl state 0x417
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+ssl_dissect_change_cipher_spec Not using Session resumption
+ssl_load_keyfile dtls/ssl.keylog_file is not configured!
+ssl_finalize_decryption state = 0x417
+ssl_restore_master_key can't restore master secret using an empty Session ID
+ssl_restore_master_key can't find master secret by Client Random
+  Cannot find master secret
+packet_from_server: is from server - TRUE
+ssl_change_cipher SERVER
+  record: offset = 197, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+decrypt_ssl3_record: app_data len 40, ssl state 0x417
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+dissect_ssl3_handshake iteration 1 type 1 offset 202 length 13149043 bytes, remaining 242 
+
+dissect_ssl enter frame #10 (first time)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 229
+dissect_ssl3_record: content_type 23 Application Data
+decrypt_ssl3_record: app_data len 224, ssl state 0x417
+packet_from_server: is from server - FALSE
+decrypt_ssl3_record: using client decoder
+decrypt_ssl3_record: no decoder available
+
+dissect_ssl enter frame #11 (first time)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+decrypt_ssl3_record: app_data len 115, ssl state 0x417
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+
+dissect_ssl enter frame #12 (first time)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = 0x7f8474802f70
+  record: offset = 0, reported_length_remaining = 63
+dissect_ssl3_record: content_type 23 Application Data
+decrypt_ssl3_record: app_data len 58, ssl state 0x417
+packet_from_server: is from server - TRUE
+decrypt_ssl3_record: using server decoder
+decrypt_ssl3_record: no decoder available
+
+dissect_ssl enter frame #4 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 299
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 1 offset 5 length 290 bytes, remaining 299 
+
+dissect_ssl enter frame #6 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 1318
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 2 offset 5 length 62 bytes, remaining 71 
+  record: offset = 71, reported_length_remaining = 1247
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 11 offset 76 length 891 bytes, remaining 971 
+  record: offset = 971, reported_length_remaining = 347
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 12 offset 976 length 329 bytes, remaining 1309 
+  record: offset = 1309, reported_length_remaining = 9
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 14 offset 1314 length 0 bytes, remaining 1318 
+
+dissect_ssl enter frame #8 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 126
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 16 offset 5 length 66 bytes, remaining 75 
+  record: offset = 75, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 81, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 14 offset 86 length 3461208 bytes, remaining 126 
+
+dissect_ssl enter frame #9 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 242
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 4 offset 5 length 182 bytes, remaining 191 
+  record: offset = 191, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 197, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 1 offset 202 length 13149043 bytes, remaining 242 
+
+dissect_ssl enter frame #10 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 229
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #11 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #12 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 63
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #11 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #11 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #11 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #11 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #4 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 299
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 1 offset 5 length 290 bytes, remaining 299 
+
+dissect_ssl enter frame #6 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 1318
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 2 offset 5 length 62 bytes, remaining 71 
+  record: offset = 71, reported_length_remaining = 1247
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 11 offset 76 length 891 bytes, remaining 971 
+  record: offset = 971, reported_length_remaining = 347
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 12 offset 976 length 329 bytes, remaining 1309 
+  record: offset = 1309, reported_length_remaining = 9
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 14 offset 1314 length 0 bytes, remaining 1318 
+
+dissect_ssl enter frame #8 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 126
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 16 offset 5 length 66 bytes, remaining 75 
+  record: offset = 75, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 81, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 14 offset 86 length 3461208 bytes, remaining 126 
+
+dissect_ssl enter frame #9 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 242
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 4 offset 5 length 182 bytes, remaining 191 
+  record: offset = 191, reported_length_remaining = 51
+dissect_ssl3_record: content_type 20 Change Cipher Spec
+  record: offset = 197, reported_length_remaining = 45
+dissect_ssl3_record: content_type 22 Handshake
+dissect_ssl3_handshake iteration 1 type 1 offset 202 length 13149043 bytes, remaining 242 
+
+dissect_ssl enter frame #10 (already visited)
+packet_from_server: is from server - FALSE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 229
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #11 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 120
+dissect_ssl3_record: content_type 23 Application Data
+
+dissect_ssl enter frame #12 (already visited)
+packet_from_server: is from server - TRUE
+  conversation = 0x7f84748022d0, ssl_session = (nil)
+  record: offset = 0, reported_length_remaining = 63
+dissect_ssl3_record: content_type 23 Application Data
