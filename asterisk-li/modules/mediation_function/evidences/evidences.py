@@ -270,8 +270,6 @@ class Evidences():
 
     def create_user_sftp(self, lea, user, password, iri, cc, cpf):
         self.log.info("Evidences::create_user_sftp")
-        user = None
-        password = None
         stdout = None
         stderr = None
         #criar diretorio
