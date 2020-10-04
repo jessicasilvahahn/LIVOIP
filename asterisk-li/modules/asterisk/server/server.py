@@ -4,6 +4,7 @@ from library.ari.server import HTTPS
 from library.ari.server import BaseHTTPRequestHandler
 from os.path import exists
 from os.path import join
+from os import remove
 import base64
 from modules.asterisk.register.register import Register
 from library.ari import uris
@@ -220,6 +221,30 @@ class Handler(BaseHTTPRequestHandler):
                 msg_json = self.format_json(file)
                 self.log.debug("Server::do_POST::GET_CC: json" + str(msg_json))
                 self.wfile.write(msg_json)
+            
+            elif(parsed_path == uris.RM_RECORDS.format("")):
+                self.log.debug("Server::do_POST::RM_RECORDS")
+                iri = None
+                proxy = None
+                cc = None
+                status = False
+                if(self.headers['Content-Type'] == 'application/json'):
+                    content_length = int(self.headers['Content-Length'])
+                    body = self.rfile.read(content_length)
+                    iri = json.loads(body.decode())["iri"]
+                    proxy = json.loads(body.decode())["proxy"]
+                    cc = json.loads(body.decode())["cc"]
+                    status_iri = self.rm_record("iri",iri)
+                    status_proxy = self.rm_record("proxy",proxy)
+                    status_cc = self.rm_record("cc",cc)
+                    if(status_iri and status_proxy and status_cc):
+                        status = True
+
+                msg_json = self.format_json(status)
+                self.log.debug("Server::do_POST::RM_RECORDS: status" + str(msg_json))
+                self.wfile.write(msg_json)
+
+            
             else:
                 msg = "Path not exists!"
                 self.log.info("Server::cc_name: Alert: " + str(msg))
@@ -241,6 +266,23 @@ class Handler(BaseHTTPRequestHandler):
         
         return False
 
+    def rm_record(self, f_type, f):
+        self.log.debug("Server::do_POST::rm_record: type: " + str(f_type) + ", file: " + str(f))
+        name_file = join("/var/spool/asterisk/recording",f)
+        
+        try:
+            if(f_type == "iri" or f_type == "proxy"):
+                name_file = join(pcap.path,f)
+            
+            self.log.debug("Server::do_POST::rm_record: Trying remove file: " + str(name_file))
+            if(exists(name_file)):
+                self.log.debug("Server::do_POST::rm_record: file: " + str(name_file) + " exists")
+                remove(name_file)
+                return True
+        except Exception as error:
+            self.log.debug("Server::do_POST::rm_record: error: " + str(error))
+            return False
+        
 
 class Server(HTTPS):
     
