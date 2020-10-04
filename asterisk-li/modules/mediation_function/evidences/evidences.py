@@ -273,10 +273,11 @@ class Evidences():
                         if(self.alert_lea(lea,cpf,iri_name,cc_name)):
                             self.change_state(int(cdr_targets_id))
                             self.rm_files_asterisk(iri_name,proxy_name,cc_name)
+                            self.log.debug("Evidences::get_evidences: paths: " + str(new_path_iri) + "," + str(new_path_cc))
                             iri_a = join(new_path_iri,iri_name + ".A")
                             iri_b = join(new_path_iri,iri_name + ".B")
                             iri = join(new_path_iri,iri_name)
-                            cc = join(new_path_iri,cc_name)
+                            cc = join(new_path_cc,cc_name)
                             self.log.debug("Evidences::get_evidences: remove: " + iri_a + "," + iri_b + "," + iri + "," + cc)
                             self.rm_records(iri_a)
                             self.rm_records(iri_b)
