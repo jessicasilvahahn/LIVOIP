@@ -241,9 +241,6 @@ class Handler(BaseHTTPRequestHandler):
                         status = True
 
                 msg_json = self.format_json(status)
-                self.send_response(200)
-                self.send_header('Content-type','application/json')
-                self.end_headers()      
                 self.log.debug("Server::do_POST::RM_RECORDS: status" + str(msg_json))
                 self.wfile.write(msg_json)
 
