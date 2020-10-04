@@ -5,6 +5,7 @@ from library.ari.uris import GET_PCAP
 from library.ari.uris import GET_RECORD
 from library.ari.uris import GET_IRI
 from library.ari.uris import GET_CC
+from library.ari.uris import RM_RECORDS
 from library.smtp.smtp import SmtpGmail
 from library.smtp.smtp import MimeType
 from scapy.utils import PcapReader
@@ -90,7 +91,7 @@ class Evidences():
                     state = self.join_pcap(pcap_a, pcap_b, new_pcap)
         
         self.log.info("Evidences::get_iri: state: " + str(state))
-        return (state,iri_name)
+        return (state,iri_name,proxy_name)
 
     def get_iri_proxy(self, name:str,new_path:str):
         state = False
@@ -135,6 +136,18 @@ class Evidences():
         packets = rdpcap(name)  
         return packets
 
+    def rm_files_asterisk(self, iri, proxy, cc):
+        self.log.info("Evidences::rm_files_asterisk: files: " + iri + "," + proxy + "," + cc)
+        url = RM_RECORDS.format(self.iri_client.server_parameters['host'] + ':' + self.iri_client.server_parameters['port'])
+        data = json.dumps({"iri": iri, "proxy": proxy, "cc": cc})
+        (code, response_json, response) = self.iri_client.http_request(Method.POST,url,False,{'Content-Type':'application/json'},data)
+        self.log.debug("Evidences::rm_files_asterisk: code response: " + str(code))
+        if(code == 200):    
+            self.log.debug("Evidences::rm_files_asterisk: response_json: " + str(response_json))
+
+        return response_json
+
+
     def get_file_name(self, call_id, interception_id, type_file):
         self.log.info("Evidences::get_file_name")
         file_name = None
@@ -178,7 +191,7 @@ class Evidences():
                     file.write(chunk)
                 file.close()
                 state = True
-        
+
         self.log.info("Evidences::get_cc: state: " + str(state))
         return (state,cc_name)
 
@@ -253,12 +266,22 @@ class Evidences():
                     new_path_iri = self.create_dir(self.path_iri,cpf)
                     new_path_cc = self.create_dir(self.path_cc,cpf)
                     (state_cc,cc_name) = self.get_cc(call_id,interception_id,new_path_cc)
-                    (state_iri,iri_name) = self.get_iri(call_id,interception_id,new_path_iri)
+                    (state_iri,iri_name,proxy_name) = self.get_iri(call_id,interception_id,new_path_iri)
                     self.log.debug("Evidences::get_evidences: states: " + str(state_iri) + ' ' + str(state_cc))
                     if(state_iri and state_cc):
                         self.log.debug("Evidences::get_evidences: evidences (iri and cc) founded!")
                         if(self.alert_lea(lea,cpf,iri_name,cc_name)):
                             self.change_state(int(cdr_targets_id))
+                            self.rm_files_asterisk(iri_name,proxy_name,cc_name)
+                            iri_a = join(new_path_iri,iri_name + ".A")
+                            iri_b = join(new_path_iri,iri_name + ".B")
+                            iri = join(new_path_iri,iri_name)
+                            cc = join(new_path_iri,cc_name)
+                            self.log.debug("Evidences::get_evidences: remove: " + iri_a + "," + iri_b + "," + iri + "," + cc)
+                            self.rm_records(iri_a)
+                            self.rm_records(iri_b)
+                            self.rm_records(iri)
+                            self.rm_records(cc)
                             continue
 
                         self.alerted_targets.remove(cdr_targets_id)
@@ -267,6 +290,12 @@ class Evidences():
                         self.log.warning("Evidences::get_evidences: evidences (iri and cc) not found")
             self.log.info("Evidences::get_evidences: Sleeping ... ")
             time.sleep(3)
+
+    def rm_records(self, record):
+        self.log.debug("Evidences::rm_records: record: " + str(record))
+        if(exists(record)):
+            self.log.debug("Evidences::rm_records: Trying remove file: " + str(record))
+            remove(record)
 
     def create_user_sftp(self, lea, user, password, iri, cc, cpf):
         self.log.info("Evidences::create_user_sftp")
